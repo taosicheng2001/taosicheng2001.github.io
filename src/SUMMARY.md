@@ -6,8 +6,9 @@
     * [Data Structure](./Notes/Linux_Kernel/Data_Structure.md)
     * [Interrupt](./Notes/Linux_Kernel/Interrupt.md)
 * [Essay Summary](./Notes/Essay_Summary/README.md)
-    * [ASPLOS2023](./Notes/Essay_Summary/ASPLOS2023/README.md)
-        * [2A](./Notes/Essay_Summary/ASPLOS2023/2A.md)
+    * [ASPLOS2023](./Notes/Essay_Summary/ASPLOS2023/index.md)
+        * [2A](./Notes/Essay_Summary/ASPLOS2023/2A/index.md)
+            * [SPLENDID](./Notes/Essay_Summary/ASPLOS2023/2A/SPLENDID.md)
 
 # Scratch
 - [Tricks](./Tricks.md)

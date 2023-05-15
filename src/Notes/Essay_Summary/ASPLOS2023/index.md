@@ -2,4 +2,5 @@
 
 Store summary and ideas for ASPLOS2023
 
-* [2A](./2A.md)
+
+* [2A](./2A/index.md)

@@ -1,4 +1,3 @@
-[toc]
 # ASPLOS2023
 
 ## SPLENDID
@@ -29,8 +28,29 @@ Translating parallel IR to portable prallel source code is *not a trivial task*
 
 SPLENDID:
 
-The first LLVM-to-C/OpenMP decompiler that provides portable natural translation from parallel LLVM-IR to OpenMP-parallel source code. 
+- The first LLVM-to-C/OpenMP decompiler that provides portable natural translation from parallel LLVM-IR to OpenMP-parallel source code. 
+- Explicitly represents parallelism through the widely used parallel programming model, OpenMP
+- Restore variable names
 
-Explicitly represents parallelism through the widely used parallel programming model, OpenMP
+### MOTIVATION
+Three roadblocks preventing decompilation from enabling collaborative parallelization
+- Lack of Explicit Prallelism
+- Obfuscated Control Flow Translation
+- Variable Names Irrelevant to Semantics
 
-Restore variable names
+### DESIGN AND IMPLEMENTATION
+#### Parallel Source Code Generation
+1. Parallel Semantic Analyzer
+2. Parallel Region Detransformer
+3. Pragma Generator
+
+#### Natural Control-Flow Generation
+Loop Rotate Detransformer
+
+#### Variable Generation
+1. Variable Proposer
+2. Variable Generator
+
+## Conclusion
+SPLENDID convert LLVM-IR to compiler-parallized source code. To make the source code more natural, the parallization is presented by Open-MP pragma and variable is recoverd semantically, which also makes the source code portable.
+
