@@ -17,6 +17,7 @@
     * [ARXIV](./Notes/Essay_Summary/ARXIV/index.md)
         * [2023.07.05](./Notes/Essay_Summary/ARXIV/data/20230705.md)
         * [2023.07.06](./Notes/Essay_Summary/ARXIV/data/20230706.md)
+        * [2023.07.19](./Notes/Essay_Summary/ARXIV/data/20230719.md)
 * [Nemu](./Notes/Nemu/index.md)
     * [PA1](./Notes/Nemu/PA1.md)
 
