@@ -23,6 +23,17 @@ Option
 - `-r` Transfer a directory 
 - `-z` Compressed mode
 
+## find
+Usage
+
+`find [option] path/to/file`
+
+Find and display the result according to the params
+
+Option
+- `-name Pattern` Find files that fit the pattern
+- `-o` use between two -name options to OR the selection
+
 ## ldd
 Usage
 
