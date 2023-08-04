@@ -4,6 +4,8 @@
 * [About Myself](./README.md)
 
 # Sora's Notes
+* [C Tricks](./Notes/CTricks.md)
+* [Makefile](./Notes/Makefile.md)
 * [Unix Command](./Notes/Unix_Command.md)
 * [Linux Kernel](./Notes/Linux_Kernel.md)
     * [Data Structure](./Notes/Linux_Kernel/Data_Structure.md)
