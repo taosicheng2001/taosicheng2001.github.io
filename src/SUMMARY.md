@@ -22,6 +22,7 @@
         * [2023.07.19](./Notes/Essay_Summary/ARXIV/data/20230719.md)
 * [Nemu](./Notes/Nemu/index.md)
     * [PA1](./Notes/Nemu/PA1.md)
+    * [PA2](./Notes/Nemu/PA2.md)
 
 # Scratch
 - [Tricks](./Tricks.md)
