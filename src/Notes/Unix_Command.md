@@ -89,3 +89,4 @@ Makefile command
 Option
 - `-C dir` Change to directory `dir` before reading the makefiles or doing something else. **If multiple -C option are specified**, each is interpreted relative to previous one.
 - `-s` Silent operation, do not print the command as they are executed
+- `-f file` Use `file` as makefile to run
