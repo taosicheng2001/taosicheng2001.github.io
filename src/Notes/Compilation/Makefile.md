@@ -45,6 +45,18 @@ endif
 ### FindString
 `$(findstring <find>, <in>)` will return string `<find>` if string `<in>` has substring `<find>`
 
+### Foreach
+`$(foreach var, list, text)` will expand list and set each word of the expanded value of list to var, and is used to expand text
+1. for example:
+
+    `dirs := a b c d`
+    
+    `files := $(foreach dir, $(dirs), $(wildcard $(dir)/*))`
+
+    will have the same result as
+
+    `files := $(wildcard a/* b/* c/* d/*)`
+
 ### Subst
 `$(subst from, to, text)` will replace each occurrence of `from` in `text` to `to`
 
