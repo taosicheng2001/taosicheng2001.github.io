@@ -28,6 +28,8 @@
     * [PA1](./Notes/Nemu/PA1.md)
     * [PA2](./Notes/Nemu/PA2.md)
     * [PA3](./Notes/Nemu/PA3.md)
+* [NixOS](./Notes/NixOS/index.md)
+
 # Scratch
 - [Tricks](./Tricks.md)
 
