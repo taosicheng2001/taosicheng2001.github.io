@@ -41,4 +41,10 @@ extern char font[]
 
 Used `[]` to declare a extern reference to list
 
-
+## HashMap in C
+```
+#include <search.h>
+hcreate();
+hsearch();
+hdestory();
+```
