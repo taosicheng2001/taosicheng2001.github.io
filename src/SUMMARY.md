@@ -30,6 +30,12 @@
     * [PA3](./Notes/Nemu/PA3.md)
 * [NixOS](./Notes/NixOS/index.md)
 
+# SpinalHDL
+- [Note](./SpinalHDL/index.md)
+    - [DataType](./SpinalHDL/Note/DataType.md)
+    - [Structuring](./SpinalHDL/Note/Structuring.md)
+    - [Others](./SpinalHDL/Note/Others.md)
+
 # Scratch
 - [Tricks](./Tricks.md)
 
