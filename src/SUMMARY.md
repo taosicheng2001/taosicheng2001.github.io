@@ -35,6 +35,14 @@
     - [DataType](./SpinalHDL/Note/DataType.md)
     - [Structuring](./SpinalHDL/Note/Structuring.md)
     - [Others](./SpinalHDL/Note/Others.md)
+    - [Semantic](./SpinalHDL/Note/Semantic.md)
+    - [SequentialLogic](./SpinalHDL/Note/SequntailLogic.md)
+
+# UCAS
+- [Note](./UCAS/index.md)
+    - [Computer Architecture](./UCAS/CA/index.md)
+        - [Chapter 3](./UCAS/CA/Slides/Chapter3.md)
+
 
 # Scratch
 - [Tricks](./Tricks.md)
