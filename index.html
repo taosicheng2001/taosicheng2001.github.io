@@ -195,15 +195,15 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>Posts</div>
-    <div class="sidebar-state-number">1</div>
+    <div class="sidebar-state-number">2</div>
   </div>
   <div class="sidebar-state-category">
     <div>Categories</div>
-    <div class="sidebar-state-number">0</div>
+    <div class="sidebar-state-number">2</div>
   </div>
   <div class="sidebar-state-tag">
     <div>Tags</div>
-    <div class="sidebar-state-number">0</div>
+    <div class="sidebar-state-number">1</div>
   </div>
 </div>
 <div class="sidebar-social">
@@ -250,14 +250,54 @@
   
   <div class="post-wrap-left wow fadeInUp">
     
-      <a class="post-link" href="/2024/04/02/hello-world/" aria-label="Hello World"></a>
+      <a class="post-link" href="/2024/04/02/Cache-Coherence-Instances/" aria-label="Cache Coherence Instances"></a>
     
     
     <div class="post-cover-left">
       
         
         
-          <img data-src="/images/soraongrass.jpg" data-sizes="auto" alt="Hello World" class="lazyload">
+          <img data-src="/covers/sora.jpg" data-sizes="auto" alt="Cache Coherence Instances" class="lazyload">
+        
+      
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2024-04-02</span>
+        <span><span class="icon-pencil"></span>700 words</span>
+        <span><span class="icon-clock"></span>2 mins</span>
+      </div>
+      <h2 class="post-title">Cache Coherence Instances</h2>
+      <article class="post-article">
+        
+           SGI ORIGIN
+
+专为大规模高可扩展系统设计
+特点
+
+动态选择coaese bit vector或limited pointer来表示目录中的share list，以节省空间
+由于不要求互联网络的强有序性，需要考虑额外的一致性消息竞争问题
+使用不表示占用属性的E状态，允许E状态和S状态的静默换出，这将导致GetS的回复过程变得更复杂
+使用Upgrade一致性请求将S状态升格为E状态，不需要请求数据
+将三种网络（request, forwarded request和response）减少为两种（request 和 response）。由此导致的死锁情况通过额外的Backoff消息来处理
+
+        
+      </article>
+    </div>
+  </div>
+
+
+  
+  
+  <div class="post-wrap-right wow fadeInUp">
+    
+    <a class="post-link" href="/2024/04/02/hello-world/"></a>
+    
+    <div class="post-cover-right">
+      
+        
+        
+          <img data-src="/covers/sora.jpg" data-sizes="auto" alt="Hello World" class="lazyload">
         
       
     </div>
@@ -312,10 +352,10 @@ More info: Writing
       
         <div>
           <span class="icon-brush"></span>
-          95
+          795
           &nbsp;|&nbsp;
           <span class="icon-coffee"></span>
-          00:01
+          00:03
         </div>
       
       
@@ -348,15 +388,15 @@ More info: Writing
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>Posts</div>
-    <div class="sidebar-state-number">1</div>
+    <div class="sidebar-state-number">2</div>
   </div>
   <div class="sidebar-state-category">
     <div>Categories</div>
-    <div class="sidebar-state-number">0</div>
+    <div class="sidebar-state-number">2</div>
   </div>
   <div class="sidebar-state-tag">
     <div>Tags</div>
-    <div class="sidebar-state-number">0</div>
+    <div class="sidebar-state-number">1</div>
   </div>
 </div>
 <div class="sidebar-social">
