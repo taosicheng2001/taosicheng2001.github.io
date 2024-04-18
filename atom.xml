@@ -3,11 +3,11 @@
   <title>ソラの小屋</title>
   
   
-  <link href="http://example.com/atom.xml" rel="self"/>
+  <link href="https://taosicheng2001.github.io/atom.xml" rel="self"/>
   
-  <link href="http://example.com/"/>
+  <link href="https://taosicheng2001.github.io/"/>
   <updated>2024-04-18T04:02:03.986Z</updated>
-  <id>http://example.com/</id>
+  <id>https://taosicheng2001.github.io/</id>
   
   <author>
     <name>Sora</name>
@@ -18,8 +18,8 @@
   
   <entry>
     <title>RISCV-BOOM(4)</title>
-    <link href="http://example.com/2024/04/18/RISCV-BOOM-4/"/>
-    <id>http://example.com/2024/04/18/RISCV-BOOM-4/</id>
+    <link href="https://taosicheng2001.github.io/2024/04/18/RISCV-BOOM-4/"/>
+    <id>https://taosicheng2001.github.io/2024/04/18/RISCV-BOOM-4/</id>
     <published>2024-04-18T03:39:09.000Z</published>
     <updated>2024-04-18T04:02:03.986Z</updated>
     
@@ -33,21 +33,21 @@
     
     
     
-    <category term="Computer Architecture" scheme="http://example.com/categories/Computer-Architecture/"/>
+    <category term="Computer Architecture" scheme="https://taosicheng2001.github.io/categories/Computer-Architecture/"/>
     
-    <category term="RISCV-BOOM" scheme="http://example.com/categories/Computer-Architecture/RISCV-BOOM/"/>
+    <category term="RISCV-BOOM" scheme="https://taosicheng2001.github.io/categories/Computer-Architecture/RISCV-BOOM/"/>
     
     
-    <category term="Code Reading" scheme="http://example.com/tags/Code-Reading/"/>
+    <category term="Code Reading" scheme="https://taosicheng2001.github.io/tags/Code-Reading/"/>
     
-    <category term="TLB" scheme="http://example.com/tags/TLB/"/>
+    <category term="TLB" scheme="https://taosicheng2001.github.io/tags/TLB/"/>
     
   </entry>
   
   <entry>
     <title>RISCV-BOOM(3)</title>
-    <link href="http://example.com/2024/04/11/RISCV-BOOM-3/"/>
-    <id>http://example.com/2024/04/11/RISCV-BOOM-3/</id>
+    <link href="https://taosicheng2001.github.io/2024/04/11/RISCV-BOOM-3/"/>
+    <id>https://taosicheng2001.github.io/2024/04/11/RISCV-BOOM-3/</id>
     <published>2024-04-11T11:59:01.000Z</published>
     <updated>2024-04-18T03:38:26.652Z</updated>
     
@@ -62,19 +62,19 @@
     
     
     
-    <category term="Computer Architecture" scheme="http://example.com/categories/Computer-Architecture/"/>
+    <category term="Computer Architecture" scheme="https://taosicheng2001.github.io/categories/Computer-Architecture/"/>
     
-    <category term="RISCV-BOOM" scheme="http://example.com/categories/Computer-Architecture/RISCV-BOOM/"/>
+    <category term="RISCV-BOOM" scheme="https://taosicheng2001.github.io/categories/Computer-Architecture/RISCV-BOOM/"/>
     
     
-    <category term="Code Reading" scheme="http://example.com/tags/Code-Reading/"/>
+    <category term="Code Reading" scheme="https://taosicheng2001.github.io/tags/Code-Reading/"/>
     
   </entry>
   
   <entry>
     <title>RISCV-BOOM(2)</title>
-    <link href="http://example.com/2024/04/07/RISCV-BOOM-2/"/>
-    <id>http://example.com/2024/04/07/RISCV-BOOM-2/</id>
+    <link href="https://taosicheng2001.github.io/2024/04/07/RISCV-BOOM-2/"/>
+    <id>https://taosicheng2001.github.io/2024/04/07/RISCV-BOOM-2/</id>
     <published>2024-04-07T05:46:00.000Z</published>
     <updated>2024-04-11T10:01:53.607Z</updated>
     
@@ -89,19 +89,19 @@
     
     
     
-    <category term="Computer Architecture" scheme="http://example.com/categories/Computer-Architecture/"/>
+    <category term="Computer Architecture" scheme="https://taosicheng2001.github.io/categories/Computer-Architecture/"/>
     
-    <category term="RISCV-BOOM" scheme="http://example.com/categories/Computer-Architecture/RISCV-BOOM/"/>
+    <category term="RISCV-BOOM" scheme="https://taosicheng2001.github.io/categories/Computer-Architecture/RISCV-BOOM/"/>
     
     
-    <category term="Code Reading" scheme="http://example.com/tags/Code-Reading/"/>
+    <category term="Code Reading" scheme="https://taosicheng2001.github.io/tags/Code-Reading/"/>
     
   </entry>
   
   <entry>
     <title>RISCV-BOOM(1)</title>
-    <link href="http://example.com/2024/04/07/RISCV-BOOM-1/"/>
-    <id>http://example.com/2024/04/07/RISCV-BOOM-1/</id>
+    <link href="https://taosicheng2001.github.io/2024/04/07/RISCV-BOOM-1/"/>
+    <id>https://taosicheng2001.github.io/2024/04/07/RISCV-BOOM-1/</id>
     <published>2024-04-07T04:43:01.000Z</published>
     <updated>2024-04-07T05:42:54.933Z</updated>
     
@@ -116,19 +116,19 @@
     
     
     
-    <category term="Computer Architecture" scheme="http://example.com/categories/Computer-Architecture/"/>
+    <category term="Computer Architecture" scheme="https://taosicheng2001.github.io/categories/Computer-Architecture/"/>
     
-    <category term="RISCV-BOOM" scheme="http://example.com/categories/Computer-Architecture/RISCV-BOOM/"/>
+    <category term="RISCV-BOOM" scheme="https://taosicheng2001.github.io/categories/Computer-Architecture/RISCV-BOOM/"/>
     
     
-    <category term="Code Reading" scheme="http://example.com/tags/Code-Reading/"/>
+    <category term="Code Reading" scheme="https://taosicheng2001.github.io/tags/Code-Reading/"/>
     
   </entry>
   
   <entry>
     <title>A survey of techniques for designing and managing CPU register file</title>
-    <link href="http://example.com/2024/04/03/A-survey-of-techniques-for-designing-and-managing-CPU-register-file/"/>
-    <id>http://example.com/2024/04/03/A-survey-of-techniques-for-designing-and-managing-CPU-register-file/</id>
+    <link href="https://taosicheng2001.github.io/2024/04/03/A-survey-of-techniques-for-designing-and-managing-CPU-register-file/"/>
+    <id>https://taosicheng2001.github.io/2024/04/03/A-survey-of-techniques-for-designing-and-managing-CPU-register-file/</id>
     <published>2024-04-03T11:37:49.000Z</published>
     <updated>2024-04-07T04:50:44.402Z</updated>
     
@@ -143,19 +143,19 @@
     
     
     
-    <category term="Computer Architecture" scheme="http://example.com/categories/Computer-Architecture/"/>
+    <category term="Computer Architecture" scheme="https://taosicheng2001.github.io/categories/Computer-Architecture/"/>
     
-    <category term="CPU register file" scheme="http://example.com/categories/Computer-Architecture/CPU-register-file/"/>
+    <category term="CPU register file" scheme="https://taosicheng2001.github.io/categories/Computer-Architecture/CPU-register-file/"/>
     
     
-    <category term="Paper Reading" scheme="http://example.com/tags/Paper-Reading/"/>
+    <category term="Paper Reading" scheme="https://taosicheng2001.github.io/tags/Paper-Reading/"/>
     
   </entry>
   
   <entry>
     <title>Cache Coherence Instances</title>
-    <link href="http://example.com/2024/04/02/Cache-Coherence-Instances/"/>
-    <id>http://example.com/2024/04/02/Cache-Coherence-Instances/</id>
+    <link href="https://taosicheng2001.github.io/2024/04/02/Cache-Coherence-Instances/"/>
+    <id>https://taosicheng2001.github.io/2024/04/02/Cache-Coherence-Instances/</id>
     <published>2024-04-02T03:18:59.000Z</published>
     <updated>2024-04-02T16:19:25.708Z</updated>
     
@@ -171,19 +171,19 @@
     
     
     
-    <category term="Computer Architecture" scheme="http://example.com/categories/Computer-Architecture/"/>
+    <category term="Computer Architecture" scheme="https://taosicheng2001.github.io/categories/Computer-Architecture/"/>
     
-    <category term="Cache Coherence" scheme="http://example.com/categories/Computer-Architecture/Cache-Coherence/"/>
+    <category term="Cache Coherence" scheme="https://taosicheng2001.github.io/categories/Computer-Architecture/Cache-Coherence/"/>
     
     
-    <category term="Direcotry Protocol" scheme="http://example.com/tags/Direcotry-Protocol/"/>
+    <category term="Direcotry Protocol" scheme="https://taosicheng2001.github.io/tags/Direcotry-Protocol/"/>
     
   </entry>
   
   <entry>
     <title>Hello World</title>
-    <link href="http://example.com/2024/04/02/hello-world/"/>
-    <id>http://example.com/2024/04/02/hello-world/</id>
+    <link href="https://taosicheng2001.github.io/2024/04/02/hello-world/"/>
+    <id>https://taosicheng2001.github.io/2024/04/02/hello-world/</id>
     <published>2024-04-02T02:17:57.116Z</published>
     <updated>2024-04-02T02:17:57.116Z</updated>
     
