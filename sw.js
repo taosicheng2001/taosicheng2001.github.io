@@ -1,4 +1,4 @@
-const VERSION = "1713412821560";
+const VERSION = "1713413424394";
 const PreCache = [
   '/images/sora_icon.png',
   '/images/banner.jpg',
