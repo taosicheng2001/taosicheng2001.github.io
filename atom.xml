@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2024-04-18T03:45:10.698Z</updated>
+  <updated>2024-04-18T04:02:03.986Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -21,7 +21,7 @@
     <link href="http://example.com/2024/04/18/RISCV-BOOM-4/"/>
     <id>http://example.com/2024/04/18/RISCV-BOOM-4/</id>
     <published>2024-04-18T03:39:09.000Z</published>
-    <updated>2024-04-18T03:45:10.698Z</updated>
+    <updated>2024-04-18T04:02:03.986Z</updated>
     
     <content type="html"><![CDATA[<p>在RISCV-BOOM(3)中，我们对BOOM前端代码<code>icache.scala</code>进行了简要分析，留下了几个问题（见文尾总结），其中一个就是ICache内部同时使用了paddr和vaddr生成Mem_idx，其具体机制不明朗。所以本章咱们接着这个思路，分析一下虚实地址设计和TLB内部的虚实地址转化机制。</p>]]></content>
     

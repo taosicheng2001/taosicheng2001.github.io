@@ -48,7 +48,7 @@
 <meta property="og:description" content="在RISCV-BOOM(3)中，我们对BOOM前端代码icache.scala进行了简要分析，留下了几个问题（见文尾总结），其中一个就是ICache内部同时使用了paddr和vaddr生成Mem_idx，其具体机制不明朗。所以本章咱们接着这个思路，分析一下虚实地址设计和TLB内部的虚实地址转化机制。">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2024-04-18T03:39:09.000Z">
-<meta property="article:modified_time" content="2024-04-18T03:45:10.698Z">
+<meta property="article:modified_time" content="2024-04-18T04:02:03.986Z">
 <meta property="article:author" content="Sora">
 <meta property="article:tag" content="Code Reading">
 <meta property="article:tag" content="TLB">
@@ -303,7 +303,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2024/04/18/RISCV-BOOM-4/" data-id="clv4pr6i6000t06sb9g2598sm" data-title="RISCV-BOOM(4)" class="article-share-link">Share</a>
+      <a data-url="http://example.com/2024/04/18/RISCV-BOOM-4/" data-id="clv4t4vtn000ludsb2r899x8p" data-title="RISCV-BOOM(4)" class="article-share-link">Share</a>
       
       
       
