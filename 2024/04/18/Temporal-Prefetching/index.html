@@ -26,7 +26,7 @@
 
   
   <title>
-    关于 |
+    Temporal Prefetching |
     
     ソラの小屋
   </title>
@@ -40,16 +40,18 @@
   
 <link rel="stylesheet" href="/css/loader.css">
 
-  <meta name="description" content="关于">
-<meta property="og:type" content="website">
-<meta property="og:title" content="关于">
-<meta property="og:url" content="https://taosicheng2001.github.io/about/index.html">
+  <meta name="description" content="Paper Reading 该文章来自MICRO-52. 2019. 题目为Temporal Prefetching Without the Off-Chip Metadata。 文章贡献如下：  提出名为Triage的时间预取器，该预取器不使用片外元数据，并且将LLC的部分用于保存预取器元数据。该设计还引入了简单的自适应机制,以动态调整存储元数据的空间大小； 利用高度精确的模拟器进行单核模拟，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Temporal Prefetching">
+<meta property="og:url" content="https://taosicheng2001.github.io/2024/04/18/Temporal-Prefetching/index.html">
 <meta property="og:site_name" content="ソラの小屋">
-<meta property="og:description" content="关于">
+<meta property="og:description" content="Paper Reading 该文章来自MICRO-52. 2019. 题目为Temporal Prefetching Without the Off-Chip Metadata。 文章贡献如下：  提出名为Triage的时间预取器，该预取器不使用片外元数据，并且将LLC的部分用于保存预取器元数据。该设计还引入了简单的自适应机制,以动态调整存储元数据的空间大小； 利用高度精确的模拟器进行单核模拟，">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2021-09-22T13:01:47.000Z">
-<meta property="article:modified_time" content="2024-04-02T01:22:12.131Z">
+<meta property="article:published_time" content="2024-04-18T08:30:13.000Z">
+<meta property="article:modified_time" content="2024-04-18T13:03:49.151Z">
 <meta property="article:author" content="Sora">
+<meta property="article:tag" content="Paper Reading">
+<meta property="article:tag" content="Code Reading">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternate" href="/atom.xml" title="ソラの小屋" type="application/atom+xml">
@@ -178,7 +180,7 @@
 </div>
 <header id="header">
   
-    <img fetchpriority="high" src="/images/Night.jpg" alt="关于">
+    <img fetchpriority="high" src="/images/Night.jpg" alt="Temporal Prefetching">
   
   <div id="header-outer" class="outer">
     <div id="header-title" class="inner">
@@ -187,7 +189,7 @@
           
           
             <a href="/" id="logo">
-              <h1>关于</h1>
+              <h1>Temporal Prefetching</h1>
             </a>
           
         
@@ -205,9 +207,14 @@
         <div id="content" class="outer">
           
             <aside id="sidebar">
-  <div class="sidebar-wrap wow fadeInRight ">
+  <div class="sidebar-wrap wow fadeInRight wrap-sticky">
     
-      <div class="sidebar-author">
+      <div class="sidebar-toc-sidebar"><div class="sidebar-toc">
+  <h3 class="toc-title">Contents</h3>
+  <div class="sidebar-toc-wrapper"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#paper-reading"><span class="toc-number">1.</span> <span class="toc-text"> Paper Reading</span></a></li></ol></div>
+</div>
+</div>
+      <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
   <img data-src="/avatar/sora.jpg" data-sizes="auto" alt="Sora" class="lazyload">
   <div class="sidebar-author-name">Sora</div>
   <div class="sidebar-description"></div>
@@ -256,8 +263,13 @@
     </div>
   
 </div>
-
+</div>
     
+    
+      <div class="sidebar-btn-wrapper" style="position:static">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
     
   </div>
 
@@ -265,16 +277,20 @@
 </aside>
 
           
-          <section id="main"><article id="page-" class="h-entry article article-type-page" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+          <section id="main"><article id="post-Temporal-Prefetching" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-inner">
     <div class="article-meta">
       <div class="article-date wow slideInLeft">
-  <a href="/about/index.html" class="article-date-link">
-    <time datetime="2021-09-22T13:01:47.000Z" itemprop="datePublished">2021-09-22</time>
+  <a href="/2024/04/18/Temporal-Prefetching/" class="article-date-link">
+    <time datetime="2024-04-18T08:30:13.000Z" itemprop="datePublished">2024-04-18</time>
   </a>
 </div>
 
       
+  <div class="article-category wow slideInLeft">
+    <a class="article-category-link" href="/categories/Computer-Architecture/">Computer Architecture</a><a class="article-category-link" href="/categories/Computer-Architecture/Cache-Prefetching/">Cache Prefetching</a>
+  </div>
+
 
     </div>
     <div class="hr-line"></div>
@@ -282,23 +298,53 @@
 
     <div class="e-content article-entry" itemprop="articleBody">
       
-        <h2 id="关于"><a class="markdownIt-Anchor" href="#关于"></a> 关于</h2>
+        <h1 id="paper-reading"><a class="markdownIt-Anchor" href="#paper-reading"></a> Paper Reading</h1>
+<p>该文章来自MICRO-52. 2019. 题目为Temporal Prefetching Without the Off-Chip Metadata。<br />
+文章贡献如下：</p>
+<ol>
+<li>提出名为Triage的时间预取器，该预取器不使用片外元数据，并且将LLC的部分用于保存预取器元数据。该设计还引入了简单的自适应机制,以动态调整存储元数据的空间大小；</li>
+<li>利用高度精确的模拟器进行单核模拟，利用ChampSim模拟器进行多核模拟。在SPEC2006，CloudSuite server测试集上获得不错的数据结果；</li>
+<li>从片上存储，片外传输和整体性能三个方面分析了时间预取器的设计空间。</li>
+</ol>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://taosicheng2001.github.io/about/index.html" data-id="clv4u179o00004usbcskl5g76" data-title="关于" class="article-share-link">Share</a>
+      <a data-url="https://taosicheng2001.github.io/2024/04/18/Temporal-Prefetching/" data-id="clv4ze89q0000kvsbhnuk554h" data-title="Temporal Prefetching" class="article-share-link">Share</a>
       
       
       
       
       
       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Code-Reading/" rel="tag">Code Reading</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Paper-Reading/" rel="tag">Paper Reading</a></li></ul>
+
 
     </footer>
   </div>
   
     
+  <nav id="article-nav" class="wow fadeInUp">
+    
+    
+    <div class="article-nav-link-wrap article-nav-link-right">
+      
+        
+        
+          <img data-src="/covers/Night.jpg" data-sizes="auto" alt="RISCV-BOOM(4)" class="lazyload">
+        
+      
+      <a href="/2024/04/18/RISCV-BOOM-4/"></a>
+      <div class="article-nav-caption">Older</div>
+      <h3 class="article-nav-title">
+        
+          RISCV-BOOM(4)
+        
+      </h3>
+    </div>
+    
+  </nav>
+
 
   
 </article>
@@ -361,7 +407,12 @@
       <nav id="mobile-nav">
   <div class="sidebar-wrap">
     
-      <div class="sidebar-author">
+      <div class="sidebar-toc-sidebar"><div class="sidebar-toc">
+  <h3 class="toc-title">Contents</h3>
+  <div class="sidebar-toc-wrapper"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#paper-reading"><span class="toc-number">1.</span> <span class="toc-text"> Paper Reading</span></a></li></ol></div>
+</div>
+</div>
+      <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
   <img data-src="/avatar/sora.jpg" data-sizes="auto" alt="Sora" class="lazyload">
   <div class="sidebar-author-name">Sora</div>
   <div class="sidebar-description"></div>
@@ -410,9 +461,14 @@
     </div>
   
 </div>
-
+</div>
     
   </div>
+  
+    <div class="sidebar-btn-wrapper">
+      <div class="sidebar-toc-btn current"></div>
+      <div class="sidebar-common-btn"></div>
+    </div>
   
 </nav>
 
