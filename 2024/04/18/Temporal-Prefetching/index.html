@@ -48,7 +48,7 @@
 <meta property="og:description" content="Paper Reading 该文章来自MICRO-52. 2019. 题目为Temporal Prefetching Without the Off-Chip Metadata。 文章贡献如下：  提出名为Triage的时间预取器，该预取器不使用片外元数据，并且将LLC的部分用于保存预取器元数据。该设计还引入了简单的自适应机制,以动态调整存储元数据的空间大小； 利用高度精确的模拟器进行单核模拟，">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2024-04-18T08:30:13.000Z">
-<meta property="article:modified_time" content="2024-04-18T13:03:49.151Z">
+<meta property="article:modified_time" content="2024-04-23T03:11:25.150Z">
 <meta property="article:author" content="Sora">
 <meta property="article:tag" content="Paper Reading">
 <meta property="article:tag" content="Code Reading">
@@ -211,7 +211,7 @@
     
       <div class="sidebar-toc-sidebar"><div class="sidebar-toc">
   <h3 class="toc-title">Contents</h3>
-  <div class="sidebar-toc-wrapper"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#paper-reading"><span class="toc-number">1.</span> <span class="toc-text"> Paper Reading</span></a></li></ol></div>
+  <div class="sidebar-toc-wrapper"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#paper-reading"><span class="toc-number">1.</span> <span class="toc-text"> Paper Reading</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#related-work"><span class="toc-number">1.1.</span> <span class="toc-text"> Related Work</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#triage-solution"><span class="toc-number">1.2.</span> <span class="toc-text"> Triage Solution</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#metadata-representation"><span class="toc-number">1.2.1.</span> <span class="toc-text"> Metadata Representation</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#metadata-replacement"><span class="toc-number">1.2.2.</span> <span class="toc-text"> Metadata Replacement</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#organization"><span class="toc-number">1.2.2.1.</span> <span class="toc-text"> Organization</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#adjusting-the-size-of-the-metadata-store"><span class="toc-number">1.2.3.</span> <span class="toc-text"> Adjusting the Size of the Metadata Store</span></a></li></ol></li></ol></li></ol></div>
 </div>
 </div>
       <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
@@ -226,7 +226,7 @@
   </div>
   <div class="sidebar-state-category">
     <div>Categories</div>
-    <div class="sidebar-state-number">7</div>
+    <div class="sidebar-state-number">5</div>
   </div>
   <div class="sidebar-state-tag">
     <div>Tags</div>
@@ -306,11 +306,50 @@
 <li>利用高度精确的模拟器进行单核模拟，利用ChampSim模拟器进行多核模拟。在SPEC2006，CloudSuite server测试集上获得不错的数据结果；</li>
 <li>从片上存储，片外传输和整体性能三个方面分析了时间预取器的设计空间。</li>
 </ol>
+<h2 id="related-work"><a class="markdownIt-Anchor" href="#related-work"></a> Related Work</h2>
+<ol>
+<li><strong>Table-Based Temporal Prefetchers</strong> 使用Table来记录每个地址的多个可能后继。Triage基于该设计，但进行了两个优化：
+<ul>
+<li>PC Localization: 提升覆盖率和准确度，同时减少Table的大小</li>
+<li>Customized Replace Policy: 识别最有用的表项</li>
+</ul>
+</li>
+<li><strong>GHB-Based Temporal Prefetchers</strong> 使用全局的历史缓存来记录历史上内存访问的行为，利用环形缓存区实现。</li>
+<li><strong>Irregular Stream Buffer</strong> 利用新型的元数据组织方式来存储地址关系，将相关地址映射到一个新的连续的地址空间，并利用TLB机制缓存这种映射关系。</li>
+<li>** MISB ** 基于ISB进行优化，从TLB上分离出元数据，并且以细粒度进行数据管理。Triage也使用了细粒度的元数据缓存机制，但相比之下有以下不同：
+<ul>
+<li>Space-efficient table-based organization</li>
+<li>Smart metadata management policy</li>
+<li>No metadata traffic overhead</li>
+</ul>
+</li>
+</ol>
+<h2 id="triage-solution"><a class="markdownIt-Anchor" href="#triage-solution"></a> Triage Solution</h2>
+<h3 id="metadata-representation"><a class="markdownIt-Anchor" href="#metadata-representation"></a> Metadata Representation</h3>
+<p>Triage learns PC-Localized correlated address pairs and records in a table.<br />
+优势：每一个地址对只保存一次，节省空间<br />
+缺点：对于有多个可能后继的地址（如A后面可能跟B,C,D），需要多次查表</p>
+<h3 id="metadata-replacement"><a class="markdownIt-Anchor" href="#metadata-replacement"></a> Metadata Replacement</h3>
+<p>Triage基于以下三点设计了替换策略：</p>
+<ol>
+<li>绝大多数元数据只对少部分表项有效</li>
+<li>在常常被使用的元数据表项中，只有少部分对应非冗余预取（也就是在Cache中未命中的预取数据）</li>
+<li>元数据需要进行细粒度的管理和替换<br />
+替换策略基于Hawkeye策略进行修改，该策略可以从过去的内存访问模式中学习出最优解，利用一长段历史内存访问行为（Cache倍大小的历史），通过高效算法得出最优解。</li>
+</ol>
+<h4 id="organization"><a class="markdownIt-Anchor" href="#organization"></a> Organization</h4>
+<ol>
+<li>OPTgen: train a PC-based predictor and compute the OPT solution for the past 基于PC的预测器，基于历史计算最优的解</li>
+<li>Hawkeye predictor: 保存历史最优解，预测一条带有PC的load操作，在最优解上是命中还是缺失。当新的Cache访问到来，该预测器会通知Cache用高优先级还是低优先级来插入。</li>
+<li>Metadata: 保存元数据</li>
+</ol>
+<p>Hawkeye策略可以学习出长时间段的复用，这使得关键的替换策略不会被大量无用的元数据表项淹没。Triage修改了Hawkeye策略，要求替换策略只学习未命中Cache的预取所对应的元数据。Triage将Hawkeye的训练推迟到带有metadata的预取请求被发到内存之后进行，如果预取请求在Cache中命中了，则让训练器忽视掉这个预取。</p>
+<h3 id="adjusting-the-size-of-the-metadata-store"><a class="markdownIt-Anchor" href="#adjusting-the-size-of-the-metadata-store"></a> Adjusting the Size of the Metadata Store</h3>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://taosicheng2001.github.io/2024/04/18/Temporal-Prefetching/" data-id="clv4ze89q0000kvsbhnuk554h" data-title="Temporal Prefetching" class="article-share-link">Share</a>
+      <a data-url="https://taosicheng2001.github.io/2024/04/18/Temporal-Prefetching/" data-id="clvbs6z6f000gagsb33c7f99x" data-title="Temporal Prefetching" class="article-share-link">Share</a>
       
       
       
@@ -331,7 +370,7 @@
       
         
         
-          <img data-src="/covers/Night.jpg" data-sizes="auto" alt="RISCV-BOOM(4)" class="lazyload">
+          <img data-src="/covers/Night2.jpg" data-sizes="auto" alt="RISCV-BOOM(4)" class="lazyload">
         
       
       <a href="/2024/04/18/RISCV-BOOM-4/"></a>
@@ -379,10 +418,10 @@
       
         <div>
           <span class="icon-brush"></span>
-          13.5k
+          14.1k
           &nbsp;|&nbsp;
           <span class="icon-coffee"></span>
-          01:05
+          01:07
         </div>
       
       
@@ -409,7 +448,7 @@
     
       <div class="sidebar-toc-sidebar"><div class="sidebar-toc">
   <h3 class="toc-title">Contents</h3>
-  <div class="sidebar-toc-wrapper"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#paper-reading"><span class="toc-number">1.</span> <span class="toc-text"> Paper Reading</span></a></li></ol></div>
+  <div class="sidebar-toc-wrapper"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#paper-reading"><span class="toc-number">1.</span> <span class="toc-text"> Paper Reading</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#related-work"><span class="toc-number">1.1.</span> <span class="toc-text"> Related Work</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#triage-solution"><span class="toc-number">1.2.</span> <span class="toc-text"> Triage Solution</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#metadata-representation"><span class="toc-number">1.2.1.</span> <span class="toc-text"> Metadata Representation</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#metadata-replacement"><span class="toc-number">1.2.2.</span> <span class="toc-text"> Metadata Replacement</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#organization"><span class="toc-number">1.2.2.1.</span> <span class="toc-text"> Organization</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#adjusting-the-size-of-the-metadata-store"><span class="toc-number">1.2.3.</span> <span class="toc-text"> Adjusting the Size of the Metadata Store</span></a></li></ol></li></ol></li></ol></div>
 </div>
 </div>
       <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
@@ -424,7 +463,7 @@
   </div>
   <div class="sidebar-state-category">
     <div>Categories</div>
-    <div class="sidebar-state-number">7</div>
+    <div class="sidebar-state-number">5</div>
   </div>
   <div class="sidebar-state-tag">
     <div>Tags</div>
