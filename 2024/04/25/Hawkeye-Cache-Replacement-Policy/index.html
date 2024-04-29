@@ -26,7 +26,7 @@
 
   
   <title>
-    Category: Computer Architecture |
+    Hawkeye Cache Replacement Policy |
     
     ソラの小屋
   </title>
@@ -40,13 +40,22 @@
   
 <link rel="stylesheet" href="/css/loader.css">
 
-  <meta property="og:type" content="website">
-<meta property="og:title" content="ソラの小屋">
-<meta property="og:url" content="https://taosicheng2001.github.io/categories/Computer-Architecture/index.html">
+  <meta name="description" content="Hawkeye Replacement Policy 该论文来自ISCA 2016Hawkeye 在Cache替换策略中，Belady替换算法是理论上的最优解，它每次替换出未来不再或最远访问的块，但正因其需要不可能被获取到的未来信息，它是不可实现的。但是如果从过去的行为中学习到的替换策略可以很好地预测未来的行为，那么这个替换策略就接近原始Belady算法的行为，这就是Hawkeye替换策略的核心">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hawkeye Cache Replacement Policy">
+<meta property="og:url" content="https://taosicheng2001.github.io/2024/04/25/Hawkeye-Cache-Replacement-Policy/index.html">
 <meta property="og:site_name" content="ソラの小屋">
+<meta property="og:description" content="Hawkeye Replacement Policy 该论文来自ISCA 2016Hawkeye 在Cache替换策略中，Belady替换算法是理论上的最优解，它每次替换出未来不再或最远访问的块，但正因其需要不可能被获取到的未来信息，它是不可实现的。但是如果从过去的行为中学习到的替换策略可以很好地预测未来的行为，那么这个替换策略就接近原始Belady算法的行为，这就是Hawkeye替换策略的核心">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://taosicheng2001.github.io/images/Hawkeye.png">
+<meta property="og:image" content="https://taosicheng2001.github.io/images/OPTgen.png">
+<meta property="og:image" content="https://taosicheng2001.github.io/images/HawkeyeUpdate.png">
+<meta property="article:published_time" content="2024-04-25T02:39:14.000Z">
+<meta property="article:modified_time" content="2024-04-25T08:24:28.907Z">
 <meta property="article:author" content="Sora">
+<meta property="article:tag" content="Paper Reading">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://taosicheng2001.github.io/images/Hawkeye.png">
   
     <link rel="alternate" href="/atom.xml" title="ソラの小屋" type="application/atom+xml">
   
@@ -174,7 +183,7 @@
 </div>
 <header id="header">
   
-    <img fetchpriority="high" src="/images/Night.jpg" alt="">
+    <img fetchpriority="high" src="/images/Night.jpg" alt="Hawkeye Cache Replacement Policy">
   
   <div id="header-outer" class="outer">
     <div id="header-title" class="inner">
@@ -183,7 +192,7 @@
           
           
             <a href="/" id="logo">
-              <h1>Categories</h1>
+              <h1>Hawkeye Cache Replacement Policy</h1>
             </a>
           
         
@@ -191,8 +200,6 @@
       
         
         <h2 id="subtitle-wrap">
-          
-            <a href="/" id="subtitle">Computer Architecture</a>
           
         </h2>
       
@@ -203,9 +210,14 @@
         <div id="content" class="outer">
           
             <aside id="sidebar">
-  <div class="sidebar-wrap wow fadeInRight ">
+  <div class="sidebar-wrap wow fadeInRight wrap-sticky">
     
-      <div class="sidebar-author">
+      <div class="sidebar-toc-sidebar"><div class="sidebar-toc">
+  <h3 class="toc-title">Contents</h3>
+  <div class="sidebar-toc-wrapper"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#hawkeye-replacement-policy"><span class="toc-number">1.</span> <span class="toc-text"> Hawkeye Replacement Policy</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#implementation"><span class="toc-number">1.1.</span> <span class="toc-text"> Implementation</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#optgen"><span class="toc-number">1.1.1.</span> <span class="toc-text"> OPTgen</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#reducing-the-size-of-optgen"><span class="toc-number">1.1.2.</span> <span class="toc-text"> Reducing the Size of OPTgen</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#granularity-of-the-occupancy-vector"><span class="toc-number">1.1.2.1.</span> <span class="toc-text"> Granularity of the Occupancy Vector</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#set-dueling"><span class="toc-number">1.1.2.2.</span> <span class="toc-text"> Set Dueling</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#hawkeye-predictor"><span class="toc-number">1.1.3.</span> <span class="toc-text"> Hawkeye Predictor</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#cache-replacement"><span class="toc-number">1.1.4.</span> <span class="toc-text"> Cache Replacement</span></a></li></ol></li></ol></li></ol></div>
+</div>
+</div>
+      <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
   <img data-src="/avatar/sora.jpg" data-sizes="auto" alt="Sora" class="lazyload">
   <div class="sidebar-author-name">Sora</div>
   <div class="sidebar-description"></div>
@@ -254,8 +266,13 @@
     </div>
   
 </div>
-
+</div>
     
+    
+      <div class="sidebar-btn-wrapper" style="position:static">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
     
   </div>
 
@@ -263,241 +280,120 @@
 </aside>
 
           
-          <section id="main">
-<div class="archives-outer-wrap wow fadeInUp">
-  <div class="tag-wrap">
-    
-      <div class="archives-tag-list-item">
-        <a class="archives-tag-list-link" href="/tags/Paper-Reading/">Paper Reading</a>
-      </div>
-    
-      <div class="archives-tag-list-item">
-        <a class="archives-tag-list-link" href="/tags/Direcotry-Protocol/">Direcotry Protocol</a>
-      </div>
-    
-      <div class="archives-tag-list-item">
-        <a class="archives-tag-list-link" href="/tags/Code-Reading/">Code Reading</a>
-      </div>
-    
-      <div class="archives-tag-list-item">
-        <a class="archives-tag-list-link" href="/tags/TLB/">TLB</a>
-      </div>
-    
-      <div class="archives-tag-list-item">
-        <a class="archives-tag-list-link" href="/tags/Mannul-Reading/">Mannul Reading</a>
-      </div>
-    
+          <section id="main"><article id="post-Hawkeye-Cache-Replacement-Policy" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner">
+    <div class="article-meta">
+      <div class="article-date wow slideInLeft">
+  <a href="/2024/04/25/Hawkeye-Cache-Replacement-Policy/" class="article-date-link">
+    <time datetime="2024-04-25T02:39:14.000Z" itemprop="datePublished">2024-04-25</time>
+  </a>
+</div>
+
+      
+  <div class="article-category wow slideInLeft">
+    <a class="article-category-link" href="/categories/Computer-Architecture/">Computer Architecture</a><a class="article-category-link" href="/categories/Computer-Architecture/Cache/">Cache</a>
   </div>
-  <div class="category-wrap">
+
+
+    </div>
+    <div class="hr-line"></div>
     
-      <div class="archives-category-list-item">
-        <a class="archives-category-list-link" href="/categories/Computer-Architecture/">Computer Architecture</a>
-      </div>
-    
-      <div class="archives-category-list-item">
-        <a class="archives-category-list-link" href="/categories/Computer-Architecture/RISCV-BOOM/">RISCV-BOOM</a>
-      </div>
-    
-      <div class="archives-category-list-item">
-        <a class="archives-category-list-link" href="/categories/Computer-Architecture/CPU-register-file/">CPU register file</a>
-      </div>
-    
-      <div class="archives-category-list-item">
-        <a class="archives-category-list-link" href="/categories/Computer-Architecture/Cache-Coherence/">Cache Coherence</a>
-      </div>
-    
-      <div class="archives-category-list-item">
-        <a class="archives-category-list-link" href="/categories/Computer-Architecture/Cache-Prefetching/">Cache Prefetching</a>
-      </div>
-    
-      <div class="archives-category-list-item">
-        <a class="archives-category-list-link" href="/categories/Computer-Architecture/Cache/">Cache</a>
-      </div>
-    
-      <div class="archives-category-list-item">
-        <a class="archives-category-list-link" href="/categories/Computer-Architecture/RISCV/">RISCV</a>
-      </div>
-    
+
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="hawkeye-replacement-policy"><a class="markdownIt-Anchor" href="#hawkeye-replacement-policy"></a> Hawkeye Replacement Policy</h1>
+<p>该论文来自ISCA 2016<a target="_blank" rel="noopener" href="https://ieeexplore.ieee.org/document/7551384">Hawkeye</a></p>
+<p>在Cache替换策略中，Belady替换算法是理论上的最优解，它每次替换出未来不再或最远访问的块，但正因其需要不可能被获取到的未来信息，它是不可实现的。但是如果从过去的行为中学习到的替换策略可以很好地预测未来的行为，那么这个替换策略就接近原始Belady算法的行为，这就是Hawkeye替换策略的核心思想，其替换策略分为两个部分，OPTgen用于从过去的历史访存行为中构建Belady算法的最优解，Predictor用于学习最优解在过去PC上的行为，并用于预测。</p>
+<p>基于这两个部分，Hawkeye有这两个问题=&gt;解决方法</p>
+<ol>
+<li>一个能快速构建出OPT的机制 =&gt; 有效性时间间隔</li>
+<li>用于计算OPT的长历史 =&gt; Set Dueling 采样</li>
+</ol>
+<h2 id="implementation"><a class="markdownIt-Anchor" href="#implementation"></a> Implementation</h2>
+<p>Hawkeye将缓存替换视为一个二分类问题，目的是把一个到来的Cache分类为cache-friendly或cache-averse。被标记为cache-friendly的块以高优先级插入，而标记为cache-averse的块被视作未来冲突时的换出候选。Hawkeye的具体架构如下图所示<br />
+<img src="/images/Hawkeye.png" alt="" /></p>
+<h3 id="optgen"><a class="markdownIt-Anchor" href="#optgen"></a> OPTgen</h3>
+<p>OPTgen一直在回答一个问题：基于内存访问的历史序列，该序列中包含一个对某个Cache Line的访问操作X，那么在给定的OPT策略下，下一次针对这个Cache Line的访问X’，是会命中还是会缺失。一个显然的发现是：从访问操作X（包括X）到下一次访问X’之前(不包括X’)这段时间反应了X操作对缓存的需求，因为之后对X的重用X’'会被X’打断，这个使用间隔可以让OPTgen确定对X’的引用是否会命中。因此定义一个Cache Line的有效性间隔为基于给定的OPT策略下，该Cache Line可以在缓存中呆多久。那么如果X在其有效性间隔的某点上，Cache内所有重叠的有效性间隔数等于缓存容量，则X肯定会触发缓存未命中，否则不会。</p>
+<p>Hawkeye使用<code>occupancy vector</code>来记录占用缓存的容量，并按照如下规则进行更新：</p>
+<ol>
+<li>第一次进入的X,不对向量产生任何修改</li>
+<li>如果向量中存在相同的访存（存在X，到来了X’），X’的位置设置为0</li>
+<li>在2的同时，检查从X到X’的有效时间间隔内，计数器是否小于缓存容量。如果确实小于，那么意味着命中，从X到X’前都都进行加一；否则意味着未命中，不修改向量。<br />
+下图是一个具体执行时的样例:<br />
+<img src="/images/OPTgen.png" alt="" /><br />
+对于多路组相连的Cache而言，OPTgen为每个Cache Set都保存一个<code>occupancy vector</code>,每个向量的容量为相连度的8倍。对于16路组相连的Cache而言，每个<code>occupancy vector</code>都有128个元素，每个元素的大小是4bit宽（这里是计数器表征数量）</li>
+</ol>
+<h3 id="reducing-the-size-of-optgen"><a class="markdownIt-Anchor" href="#reducing-the-size-of-optgen"></a> Reducing the Size of OPTgen</h3>
+<h4 id="granularity-of-the-occupancy-vector"><a class="markdownIt-Anchor" href="#granularity-of-the-occupancy-vector"></a> Granularity of the Occupancy Vector</h4>
+<p>减少<code>occupancy vector</code>最有效的办法就是提升颗粒度，向量的每个元素不再表示单次缓存的访问，而是表示一个时间片段，一个以高速访存次数为计量的时间单元。根据实验，时间单元设置为4次缓存访问比较合适。</p>
+<h4 id="set-dueling"><a class="markdownIt-Anchor" href="#set-dueling"></a> Set Dueling</h4>
+<p>为了进一步降低开销，OPTgen对64个随机选择的Set更新OPT，这已经足够为训练器提供高质量的数据了。这样的方法首先使得OPTgen数据集的占用向量减少为64个，其次它也大大地减少了历史记录的大小，只需要跟踪64个采样集的有效时间间隔。为了追踪采样set的有效时间间隔，使用采样缓存。采样缓存中的每个项保存2字节的地址TAG，2字节的load指令PC，1字节的时间戳，采用LRU策略进行驱逐。</p>
+<h3 id="hawkeye-predictor"><a class="markdownIt-Anchor" href="#hawkeye-predictor"></a> Hawkeye Predictor</h3>
+<p>Hawkeye预测器的核心前提是，对于相同PC的load指令，两次访存具有同样缓存动作的概率非常高。因此Hawkeye预测器学习一个给定PC的load指令在OPT策略下本应该造成命中还是缺失：如果OPTgen认为访问操作X在OPT策略下应当命中，那么最后一次访问X的PC被训练为正向，否则训练为反向。每次访问高速缓存的时候，预测器将当前load指令作为索引，3bit计数器的最高位表示其是cache-friendly还是cache-averse状态，这决定该行的替换状态。</p>
+<h3 id="cache-replacement"><a class="markdownIt-Anchor" href="#cache-replacement"></a> Cache Replacement</h3>
+<p>我们的替换目标是在程序的某个阶段内使用Hawkeye的预测，在阶段装转化边界使用LRU，因此Hawkeye首先会驱逐被认为是cache-averse的块，如果没有这样的块，再去驱逐最老的cache-friendly块。当cache-friendly的块被驱逐时，如果采样Cache中存在这个行，与该行最后load指令对应的预测器项会被递减（？？？）。在实现中，每个cache块都有一个3比特的RRIP计数器，用于表示其驱逐优先级，数字越高，被驱逐的优先级就越大。每次Cache访存到来之时，Hawkeye预测器越策其是cache-friendly还是cache-averse类型，并基于这个类型更新其RRIP计数器，规则如下：<br />
+<img src="/images/HawkeyeUpdate.png" alt="" /></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://taosicheng2001.github.io/2024/04/25/Hawkeye-Cache-Replacement-Policy/" data-id="clvemxtzd00004ds6dgsegaxq" data-title="Hawkeye Cache Replacement Policy" class="article-share-link">Share</a>
+      
+      
+      
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Paper-Reading/" rel="tag">Paper Reading</a></li></ul>
+
+
+    </footer>
   </div>
   
+    
+  <nav id="article-nav" class="wow fadeInUp">
+    
+      <div class="article-nav-link-wrap article-nav-link-left">
+        
+          
+          
+            <img data-src="/covers/Night2.jpg" data-sizes="auto" alt="RISC-V Privileged Mannul" class="lazyload">
+          
+        
+        <a href="/2024/04/28/RISC-V-Privileged-Mannul/"></a>
+        <div class="article-nav-caption">Newer</div>
+        <h3 class="article-nav-title">
+          
+            RISC-V Privileged Mannul
+          
+        </h3>
+      </div>
+    
+    
+    <div class="article-nav-link-wrap article-nav-link-right">
+      
+        
+        
+          <img data-src="/covers/Night2.jpg" data-sizes="auto" alt="Temporal Prefetching" class="lazyload">
+        
+      
+      <a href="/2024/04/18/Temporal-Prefetching/"></a>
+      <div class="article-nav-caption">Older</div>
+      <h3 class="article-nav-title">
+        
+          Temporal Prefetching
+        
+      </h3>
+    </div>
+    
+  </nav>
+
+
   
-    
-    
-      
-      
-      <section class="archives-wrap wow fadeInUp">
-        <div class="archive-year-wrap">
-          <a href="/archives/2024" class="archive-year">2024</a>
-        </div>
-        <div class="archives">
-          <ul>
-            
-            <li class="archive-article">
-  <div class="archive-article-date-wrap">
-    <a href="/2024/04/28/RISC-V-Privileged-Mannul/">
-      <time class="dt-published" datetime="2024-04-28T01:22:48.000Z" itemprop="datePublished">04-28</time>
-    </a>
-  </div>
-  <div class="archive-article-title-wrap">
-    
-      
-        <a class="archive-article-title" href="/2024/04/28/RISC-V-Privileged-Mannul/">RISC-V Privileged Mannul</a>
-      
-    
-  </div>
-</li>
+</article>
 
-            
-    
-    
-            <li class="archive-article">
-  <div class="archive-article-date-wrap">
-    <a href="/2024/04/25/Hawkeye-Cache-Replacement-Policy/">
-      <time class="dt-published" datetime="2024-04-25T02:39:14.000Z" itemprop="datePublished">04-25</time>
-    </a>
-  </div>
-  <div class="archive-article-title-wrap">
-    
-      
-        <a class="archive-article-title" href="/2024/04/25/Hawkeye-Cache-Replacement-Policy/">Hawkeye Cache Replacement Policy</a>
-      
-    
-  </div>
-</li>
 
-            
-    
-    
-            <li class="archive-article">
-  <div class="archive-article-date-wrap">
-    <a href="/2024/04/18/Temporal-Prefetching/">
-      <time class="dt-published" datetime="2024-04-18T08:30:13.000Z" itemprop="datePublished">04-18</time>
-    </a>
-  </div>
-  <div class="archive-article-title-wrap">
-    
-      
-        <a class="archive-article-title" href="/2024/04/18/Temporal-Prefetching/">Temporal Prefetching</a>
-      
-    
-  </div>
-</li>
 
-            
-    
-    
-            <li class="archive-article">
-  <div class="archive-article-date-wrap">
-    <a href="/2024/04/18/RISCV-BOOM-4/">
-      <time class="dt-published" datetime="2024-04-18T03:39:09.000Z" itemprop="datePublished">04-18</time>
-    </a>
-  </div>
-  <div class="archive-article-title-wrap">
-    
-      
-        <a class="archive-article-title" href="/2024/04/18/RISCV-BOOM-4/">RISCV-BOOM(4)</a>
-      
-    
-  </div>
-</li>
-
-            
-    
-    
-            <li class="archive-article">
-  <div class="archive-article-date-wrap">
-    <a href="/2024/04/11/RISCV-BOOM-3/">
-      <time class="dt-published" datetime="2024-04-11T11:59:01.000Z" itemprop="datePublished">04-11</time>
-    </a>
-  </div>
-  <div class="archive-article-title-wrap">
-    
-      
-        <a class="archive-article-title" href="/2024/04/11/RISCV-BOOM-3/">RISCV-BOOM(3)</a>
-      
-    
-  </div>
-</li>
-
-            
-    
-    
-            <li class="archive-article">
-  <div class="archive-article-date-wrap">
-    <a href="/2024/04/07/RISCV-BOOM-2/">
-      <time class="dt-published" datetime="2024-04-07T05:46:00.000Z" itemprop="datePublished">04-07</time>
-    </a>
-  </div>
-  <div class="archive-article-title-wrap">
-    
-      
-        <a class="archive-article-title" href="/2024/04/07/RISCV-BOOM-2/">RISCV-BOOM(2)</a>
-      
-    
-  </div>
-</li>
-
-            
-    
-    
-            <li class="archive-article">
-  <div class="archive-article-date-wrap">
-    <a href="/2024/04/07/RISCV-BOOM-1/">
-      <time class="dt-published" datetime="2024-04-07T04:43:01.000Z" itemprop="datePublished">04-07</time>
-    </a>
-  </div>
-  <div class="archive-article-title-wrap">
-    
-      
-        <a class="archive-article-title" href="/2024/04/07/RISCV-BOOM-1/">RISCV-BOOM(1)</a>
-      
-    
-  </div>
-</li>
-
-            
-    
-    
-            <li class="archive-article">
-  <div class="archive-article-date-wrap">
-    <a href="/2024/04/03/A-survey-of-techniques-for-designing-and-managing-CPU-register-file/">
-      <time class="dt-published" datetime="2024-04-03T11:37:49.000Z" itemprop="datePublished">04-03</time>
-    </a>
-  </div>
-  <div class="archive-article-title-wrap">
-    
-      
-        <a class="archive-article-title" href="/2024/04/03/A-survey-of-techniques-for-designing-and-managing-CPU-register-file/">A survey of techniques for designing and managing CPU register file</a>
-      
-    
-  </div>
-</li>
-
-            
-    
-    
-            <li class="archive-article">
-  <div class="archive-article-date-wrap">
-    <a href="/2024/04/02/Cache-Coherence-Instances/">
-      <time class="dt-published" datetime="2024-04-02T03:18:59.000Z" itemprop="datePublished">04-02</time>
-    </a>
-  </div>
-  <div class="archive-article-title-wrap">
-    
-      
-        <a class="archive-article-title" href="/2024/04/02/Cache-Coherence-Instances/">Cache Coherence Instances</a>
-      
-    
-  </div>
-</li>
-
-            
-            
-          </ul>
-        </div>
-      </section>
-  
-  </div>
 
 
 
@@ -554,7 +450,12 @@
       <nav id="mobile-nav">
   <div class="sidebar-wrap">
     
-      <div class="sidebar-author">
+      <div class="sidebar-toc-sidebar"><div class="sidebar-toc">
+  <h3 class="toc-title">Contents</h3>
+  <div class="sidebar-toc-wrapper"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#hawkeye-replacement-policy"><span class="toc-number">1.</span> <span class="toc-text"> Hawkeye Replacement Policy</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#implementation"><span class="toc-number">1.1.</span> <span class="toc-text"> Implementation</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#optgen"><span class="toc-number">1.1.1.</span> <span class="toc-text"> OPTgen</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#reducing-the-size-of-optgen"><span class="toc-number">1.1.2.</span> <span class="toc-text"> Reducing the Size of OPTgen</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#granularity-of-the-occupancy-vector"><span class="toc-number">1.1.2.1.</span> <span class="toc-text"> Granularity of the Occupancy Vector</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#set-dueling"><span class="toc-number">1.1.2.2.</span> <span class="toc-text"> Set Dueling</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#hawkeye-predictor"><span class="toc-number">1.1.3.</span> <span class="toc-text"> Hawkeye Predictor</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#cache-replacement"><span class="toc-number">1.1.4.</span> <span class="toc-text"> Cache Replacement</span></a></li></ol></li></ol></li></ol></div>
+</div>
+</div>
+      <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
   <img data-src="/avatar/sora.jpg" data-sizes="auto" alt="Sora" class="lazyload">
   <div class="sidebar-author-name">Sora</div>
   <div class="sidebar-description"></div>
@@ -603,9 +504,14 @@
     </div>
   
 </div>
-
+</div>
     
   </div>
+  
+    <div class="sidebar-btn-wrapper">
+      <div class="sidebar-toc-btn current"></div>
+      <div class="sidebar-common-btn"></div>
+    </div>
   
 </nav>
 

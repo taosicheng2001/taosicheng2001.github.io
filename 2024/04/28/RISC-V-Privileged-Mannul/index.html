@@ -26,7 +26,7 @@
 
   
   <title>
-    Category: Cache Prefetching |
+    RISC-V Privileged Mannul |
     
     ソラの小屋
   </title>
@@ -40,13 +40,21 @@
   
 <link rel="stylesheet" href="/css/loader.css">
 
-  <meta property="og:type" content="website">
-<meta property="og:title" content="ソラの小屋">
-<meta property="og:url" content="https://taosicheng2001.github.io/categories/Computer-Architecture/Cache-Prefetching/index.html">
+  <meta name="description" content="Privileged Software Stack  A(S&#x2F;H)BI: Application(Supervisor&#x2F;Hypervisor) Binary Interface A(S&#x2F;H)EE: Application(Supervisor&#x2F;Hypervisor) Execution Environment  Control and Statue Registers Those instruc">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RISC-V Privileged Mannul">
+<meta property="og:url" content="https://taosicheng2001.github.io/2024/04/28/RISC-V-Privileged-Mannul/index.html">
 <meta property="og:site_name" content="ソラの小屋">
+<meta property="og:description" content="Privileged Software Stack  A(S&#x2F;H)BI: Application(Supervisor&#x2F;Hypervisor) Binary Interface A(S&#x2F;H)EE: Application(Supervisor&#x2F;Hypervisor) Execution Environment  Control and Statue Registers Those instruc">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://taosicheng2001.github.io/images/SoftwareStack.png">
+<meta property="og:image" content="https://taosicheng2001.github.io/images/ExtensionField.png">
+<meta property="article:published_time" content="2024-04-28T01:22:48.000Z">
+<meta property="article:modified_time" content="2024-04-28T08:22:43.367Z">
 <meta property="article:author" content="Sora">
+<meta property="article:tag" content="Mannul Reading">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://taosicheng2001.github.io/images/SoftwareStack.png">
   
     <link rel="alternate" href="/atom.xml" title="ソラの小屋" type="application/atom+xml">
   
@@ -174,7 +182,7 @@
 </div>
 <header id="header">
   
-    <img fetchpriority="high" src="/images/Night.jpg" alt="">
+    <img fetchpriority="high" src="/images/Night.jpg" alt="RISC-V Privileged Mannul">
   
   <div id="header-outer" class="outer">
     <div id="header-title" class="inner">
@@ -183,7 +191,7 @@
           
           
             <a href="/" id="logo">
-              <h1>Categories</h1>
+              <h1>RISC-V Privileged Mannul</h1>
             </a>
           
         
@@ -191,8 +199,6 @@
       
         
         <h2 id="subtitle-wrap">
-          
-            <a href="/" id="subtitle">Cache Prefetching</a>
           
         </h2>
       
@@ -203,9 +209,14 @@
         <div id="content" class="outer">
           
             <aside id="sidebar">
-  <div class="sidebar-wrap wow fadeInRight ">
+  <div class="sidebar-wrap wow fadeInRight wrap-sticky">
     
-      <div class="sidebar-author">
+      <div class="sidebar-toc-sidebar"><div class="sidebar-toc">
+  <h3 class="toc-title">Contents</h3>
+  <div class="sidebar-toc-wrapper"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#privileged-software-stack"><span class="toc-number">1.</span> <span class="toc-text"> Privileged Software Stack</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#control-and-statue-registers"><span class="toc-number">2.</span> <span class="toc-text"> Control and Statue Registers</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#csr-address-mapping-convention"><span class="toc-number">2.1.</span> <span class="toc-text"> CSR Address Mapping Convention</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#machine-level-csrs"><span class="toc-number">2.2.</span> <span class="toc-text"> Machine-Level CSRs</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#misa"><span class="toc-number">2.2.1.</span> <span class="toc-text"> misa</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#marchid"><span class="toc-number">2.2.2.</span> <span class="toc-text"> marchid</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mimpid"><span class="toc-number">2.2.3.</span> <span class="toc-text"> mimpid</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mhartid"><span class="toc-number">2.2.4.</span> <span class="toc-text"> mhartid</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mstatus-mstatush"><span class="toc-number">2.2.5.</span> <span class="toc-text"> mstatus &amp; mstatush</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#global-interrupt-enable-bits"><span class="toc-number">2.2.5.1.</span> <span class="toc-text"> Global Interrupt Enable Bits</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#base-isa-control"><span class="toc-number">2.2.5.2.</span> <span class="toc-text"> Base ISA Control</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#memory-privilege"><span class="toc-number">2.2.5.3.</span> <span class="toc-text"> Memory Privilege</span></a></li></ol></li></ol></li></ol></li></ol></div>
+</div>
+</div>
+      <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
   <img data-src="/avatar/sora.jpg" data-sizes="auto" alt="Sora" class="lazyload">
   <div class="sidebar-author-name">Sora</div>
   <div class="sidebar-description"></div>
@@ -213,15 +224,15 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>Posts</div>
-    <div class="sidebar-state-number">8</div>
+    <div class="sidebar-state-number">10</div>
   </div>
   <div class="sidebar-state-category">
     <div>Categories</div>
-    <div class="sidebar-state-number">5</div>
+    <div class="sidebar-state-number">7</div>
   </div>
   <div class="sidebar-state-tag">
     <div>Tags</div>
-    <div class="sidebar-state-number">4</div>
+    <div class="sidebar-state-number">5</div>
   </div>
 </div>
 <div class="sidebar-social">
@@ -254,8 +265,13 @@
     </div>
   
 </div>
-
+</div>
     
+    
+      <div class="sidebar-btn-wrapper" style="position:static">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
     
   </div>
 
@@ -263,85 +279,111 @@
 </aside>
 
           
-          <section id="main">
-<div class="archives-outer-wrap wow fadeInUp">
-  <div class="tag-wrap">
-    
-      <div class="archives-tag-list-item">
-        <a class="archives-tag-list-link" href="/tags/Paper-Reading/">Paper Reading</a>
-      </div>
-    
-      <div class="archives-tag-list-item">
-        <a class="archives-tag-list-link" href="/tags/Direcotry-Protocol/">Direcotry Protocol</a>
-      </div>
-    
-      <div class="archives-tag-list-item">
-        <a class="archives-tag-list-link" href="/tags/Code-Reading/">Code Reading</a>
-      </div>
-    
-      <div class="archives-tag-list-item">
-        <a class="archives-tag-list-link" href="/tags/TLB/">TLB</a>
-      </div>
-    
-  </div>
-  <div class="category-wrap">
-    
-      <div class="archives-category-list-item">
-        <a class="archives-category-list-link" href="/categories/Computer-Architecture/">Computer Architecture</a>
-      </div>
-    
-      <div class="archives-category-list-item">
-        <a class="archives-category-list-link" href="/categories/Computer-Architecture/RISCV-BOOM/">RISCV-BOOM</a>
-      </div>
-    
-      <div class="archives-category-list-item">
-        <a class="archives-category-list-link" href="/categories/Computer-Architecture/CPU-register-file/">CPU register file</a>
-      </div>
-    
-      <div class="archives-category-list-item">
-        <a class="archives-category-list-link" href="/categories/Computer-Architecture/Cache-Coherence/">Cache Coherence</a>
-      </div>
-    
-      <div class="archives-category-list-item">
-        <a class="archives-category-list-link" href="/categories/Computer-Architecture/Cache-Prefetching/">Cache Prefetching</a>
-      </div>
-    
-  </div>
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap wow fadeInUp">
-        <div class="archive-year-wrap">
-          <a href="/archives/2024" class="archive-year">2024</a>
-        </div>
-        <div class="archives">
-          <ul>
-            
-            <li class="archive-article">
-  <div class="archive-article-date-wrap">
-    <a href="/2024/04/18/Temporal-Prefetching/">
-      <time class="dt-published" datetime="2024-04-18T08:30:13.000Z" itemprop="datePublished">04-18</time>
-    </a>
-  </div>
-  <div class="archive-article-title-wrap">
-    
-      
-        <a class="archive-article-title" href="/2024/04/18/Temporal-Prefetching/">Temporal Prefetching</a>
-      
-    
-  </div>
-</li>
+          <section id="main"><article id="post-RISC-V-Privileged-Mannul" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner">
+    <div class="article-meta">
+      <div class="article-date wow slideInLeft">
+  <a href="/2024/04/28/RISC-V-Privileged-Mannul/" class="article-date-link">
+    <time datetime="2024-04-28T01:22:48.000Z" itemprop="datePublished">2024-04-28</time>
+  </a>
+</div>
 
-            
-            
-          </ul>
-        </div>
-      </section>
-  
+      
+  <div class="article-category wow slideInLeft">
+    <a class="article-category-link" href="/categories/Computer-Architecture/">Computer Architecture</a><a class="article-category-link" href="/categories/Computer-Architecture/RISCV/">RISCV</a>
   </div>
+
+
+    </div>
+    <div class="hr-line"></div>
+    
+
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="privileged-software-stack"><a class="markdownIt-Anchor" href="#privileged-software-stack"></a> Privileged Software Stack</h1>
+<p><img src="/images/SoftwareStack.png" alt="" /><br />
+A(S/H)BI: Application(Supervisor/Hypervisor) Binary Interface<br />
+A(S/H)EE: Application(Supervisor/Hypervisor) Execution Environment</p>
+<h1 id="control-and-statue-registers"><a class="markdownIt-Anchor" href="#control-and-statue-registers"></a> Control and Statue Registers</h1>
+<p>Those instructions atomically read-modify-write CSRs are defined in <code>Zicsr</code> extension</p>
+<h2 id="csr-address-mapping-convention"><a class="markdownIt-Anchor" href="#csr-address-mapping-convention"></a> CSR Address Mapping Convention</h2>
+<p>标准RISC—V ISA使用12比特编码4096个CSR。其中csr[11:10]标志CSR寄存器的读写权限，csr[9:8]标志可以操作CSR寄存器的特权等级。具体CSR寄存器的功用需要查表。<br />
+寄存器内容的特殊字段规定</p>
+<ol>
+<li>WPRI: 软件忽略从这些字段中读取的值，对寄存器写入时也忽略该字段；</li>
+<li>WLRL: 软件只有写入合法值内容时，下一次的读取结果才为写入值，否则读取的结果是非法写入值与写前的原值共同决定的结果；</li>
+<li>WARL: 软件只有写入合法值内容时，下一次的读取结果才为写入值，否则读取的结果是非法写入值与hart的状态共同决定的结果。<br />
+Tips:</li>
+<li>如果对某个CSR的写入，导致另一个CSR某个字段的合法取值集合变化，则需要让这个CSR的某字段立刻在其新合法取值集合内获得一个值，不论对该字段而言前取值是否在后取值集合中合法；</li>
+<li>如果CSR的宽度发生变化，相关字段的值会根据特定算法计算获得。</li>
+<li>任何对CSR的隐式读取，都和在足够权限下进行的显式读取得到一样的结果；</li>
+<li>1,2中CSR值的变化并不是一种对CSR的读写，不会出触发任何副作用。</li>
+</ol>
+<h2 id="machine-level-csrs"><a class="markdownIt-Anchor" href="#machine-level-csrs"></a> Machine-Level CSRs</h2>
+<h3 id="misa"><a class="markdownIt-Anchor" href="#misa"></a> misa</h3>
+<p>WARL read-write 寄存器，标志核心支持的ISA种类，MSL字段表示ISA的宽度，Exetionsion字段misa[25:0]用0-26表示A-Z字母，用来表示支持的标准扩展种类。<br />
+<img src="/images/ExtensionField.png" alt="" /></p>
+<h3 id="marchid"><a class="markdownIt-Anchor" href="#marchid"></a> marchid</h3>
+<p>read-only 寄存器，提供核心的基础微体系结构型号</p>
+<h3 id="mimpid"><a class="markdownIt-Anchor" href="#mimpid"></a> mimpid</h3>
+<p>read-only 寄存器，提供处理器型号的唯一编码，该编码反映RISC-V处理器的设计，而不包括外围系统</p>
+<h3 id="mhartid"><a class="markdownIt-Anchor" href="#mhartid"></a> mhartid</h3>
+<p>read-only 寄存器，标志当前运行代码的硬件线程的ID，在一个核心内至少存在0号硬件线程，在运行环境中，核心编码唯一。</p>
+<h3 id="mstatus-mstatush"><a class="markdownIt-Anchor" href="#mstatus-mstatush"></a> mstatus &amp; mstatush</h3>
+<p>read-write 寄存器，用于跟踪和控制线程当前的执行状态。在RV32下，部分状态保存在mstatush寄存器中。</p>
+<h4 id="global-interrupt-enable-bits"><a class="markdownIt-Anchor" href="#global-interrupt-enable-bits"></a> Global Interrupt Enable Bits</h4>
+<p>MIE 和SIE 分别是 Machine Mode和Supervisor Mode下的全局中断使能位。当线程在权限等级x下运行时，高权限等级的全局中断总是启用的，低权限等级的全局中断总是禁止的，根据xIE启用和禁用当前权限等级的全局中断。如果想要在较低权限运行状态下禁用较高特权等级的全局中断，需要让较高权限代码去单独设置该中断的使能位。<br />
+为了支持中断嵌套，利用xPIE保存trap前中断时能位的值，xPP保存trap前的特权等级。比如，当从特权模式y跳转到特权模式x时，把xPIE设置为xIE的值，把xIE设置为0，把xPP设置为y。对应的，再执行xRET指令时，把xIE的值设置为xPIE，把xIE设置为1,把特权模式切换为y，把xPP设置为最小特权模式。</p>
+<h4 id="base-isa-control"><a class="markdownIt-Anchor" href="#base-isa-control"></a> Base ISA Control</h4>
+<p>SXL和UXL分别对应S-mode和U-mode下的XLEN。</p>
+<h4 id="memory-privilege"><a class="markdownIt-Anchor" href="#memory-privilege"></a> Memory Privilege</h4>
+<p>MPRV(Modify Privilege)位决定load和store执行的全线。若MPRV=0,load和store使用当前特权模式下的地址翻译和保护机制；若MRPV=1,looad和store的内存地址将按照将当前特权模式和设置为MPP的方式被翻译和保护，并使用字节序。指令地址的转换和保护不受MPRV设置的影响。执行SRET和MRET这两个将变更特权模式到低于M-mode的模式上的指令时，会把MPRV置为0。</p>
+<p>MXR(Make eXecutable Readable)位决定load是否可以访问虚拟地址。当MXR=0时，只有来自标记为readable的页的load指令才能成功；当MXR=1时，来自标记为readable或executable的页都可以成功。当未启用基于页面的虚拟内存时，MXR没有任何效果。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://taosicheng2001.github.io/2024/04/28/RISC-V-Privileged-Mannul/" data-id="clviy5tp70000ofs69503d770" data-title="RISC-V Privileged Mannul" class="article-share-link">Share</a>
+      
+      
+      
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Mannul-Reading/" rel="tag">Mannul Reading</a></li></ul>
+
+
+    </footer>
+  </div>
+  
+    
+  <nav id="article-nav" class="wow fadeInUp">
+    
+    
+    <div class="article-nav-link-wrap article-nav-link-right">
+      
+        
+        
+          <img data-src="/covers/Night2.jpg" data-sizes="auto" alt="Hawkeye Cache Replacement Policy" class="lazyload">
+        
+      
+      <a href="/2024/04/25/Hawkeye-Cache-Replacement-Policy/"></a>
+      <div class="article-nav-caption">Older</div>
+      <h3 class="article-nav-title">
+        
+          Hawkeye Cache Replacement Policy
+        
+      </h3>
+    </div>
+    
+  </nav>
+
+
+  
+</article>
+
+
+
 
 
 
@@ -370,10 +412,10 @@
       
         <div>
           <span class="icon-brush"></span>
-          14.1k
+          20k
           &nbsp;|&nbsp;
           <span class="icon-coffee"></span>
-          01:07
+          01:33
         </div>
       
       
@@ -398,7 +440,12 @@
       <nav id="mobile-nav">
   <div class="sidebar-wrap">
     
-      <div class="sidebar-author">
+      <div class="sidebar-toc-sidebar"><div class="sidebar-toc">
+  <h3 class="toc-title">Contents</h3>
+  <div class="sidebar-toc-wrapper"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#privileged-software-stack"><span class="toc-number">1.</span> <span class="toc-text"> Privileged Software Stack</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#control-and-statue-registers"><span class="toc-number">2.</span> <span class="toc-text"> Control and Statue Registers</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#csr-address-mapping-convention"><span class="toc-number">2.1.</span> <span class="toc-text"> CSR Address Mapping Convention</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#machine-level-csrs"><span class="toc-number">2.2.</span> <span class="toc-text"> Machine-Level CSRs</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#misa"><span class="toc-number">2.2.1.</span> <span class="toc-text"> misa</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#marchid"><span class="toc-number">2.2.2.</span> <span class="toc-text"> marchid</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mimpid"><span class="toc-number">2.2.3.</span> <span class="toc-text"> mimpid</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mhartid"><span class="toc-number">2.2.4.</span> <span class="toc-text"> mhartid</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mstatus-mstatush"><span class="toc-number">2.2.5.</span> <span class="toc-text"> mstatus &amp; mstatush</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#global-interrupt-enable-bits"><span class="toc-number">2.2.5.1.</span> <span class="toc-text"> Global Interrupt Enable Bits</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#base-isa-control"><span class="toc-number">2.2.5.2.</span> <span class="toc-text"> Base ISA Control</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#memory-privilege"><span class="toc-number">2.2.5.3.</span> <span class="toc-text"> Memory Privilege</span></a></li></ol></li></ol></li></ol></li></ol></div>
+</div>
+</div>
+      <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
   <img data-src="/avatar/sora.jpg" data-sizes="auto" alt="Sora" class="lazyload">
   <div class="sidebar-author-name">Sora</div>
   <div class="sidebar-description"></div>
@@ -406,15 +453,15 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>Posts</div>
-    <div class="sidebar-state-number">8</div>
+    <div class="sidebar-state-number">10</div>
   </div>
   <div class="sidebar-state-category">
     <div>Categories</div>
-    <div class="sidebar-state-number">5</div>
+    <div class="sidebar-state-number">7</div>
   </div>
   <div class="sidebar-state-tag">
     <div>Tags</div>
-    <div class="sidebar-state-number">4</div>
+    <div class="sidebar-state-number">5</div>
   </div>
 </div>
 <div class="sidebar-social">
@@ -447,9 +494,14 @@
     </div>
   
 </div>
-
+</div>
     
   </div>
+  
+    <div class="sidebar-btn-wrapper">
+      <div class="sidebar-toc-btn current"></div>
+      <div class="sidebar-common-btn"></div>
+    </div>
   
 </nav>
 
