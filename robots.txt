@@ -1,0 +1,17 @@
+# hexo robots.txt
+# hexo robots.txt
+User-agent: *
+Allow: /
+Allow: /about/
+Allow: /archives/
+Allow: /categories/
+Allow: /tags/
+Allow: /2024/
+
+Disallow: /covers/
+Disallow: /img/
+Disallow: /js/
+Disallow: /css/
+
+Sitemap: https://taosicheng2001.github.io/sitemap.xml
+Sitemap: https://taosicheng2001.github.io/baidusitemap.xml

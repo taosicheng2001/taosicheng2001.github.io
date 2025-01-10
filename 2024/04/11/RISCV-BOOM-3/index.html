@@ -1,0 +1,672 @@
+
+  <!DOCTYPE html>
+  <html lang="en"  data-theme="dark" >
+  <head>
+  <meta charset="utf-8">
+  
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script src="https://www.googletagmanager.com/gtag/js?id=G-W2D8Z0W2X1"></script>
+  <script data-pjax>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'G-W2D8Z0W2X1');
+  </script>
+  <!-- End Google Analytics -->
+
+
+  
+
+  
+
+  
+  <title>
+    RISCV-BOOM(3) |
+    
+    ソラの小屋
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="preload" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic%7CNoto%20Serif%20SC:400,400italic,700,700italic%7CUbuntu%20Mono:400,400italic,700,700italic&display=swap&subset=latin,latin-ext" as="style" onload="this.onload&#x3D;null;this.rel&#x3D;&#39;stylesheet&#39;">
+  
+<link rel="stylesheet" href="https://npm.webcache.cn/@fortawesome/fontawesome-free@6.5.1/css/regular.min.css">
+<link rel="stylesheet" href="https://npm.webcache.cn/@fortawesome/fontawesome-free@6.5.1/css/solid.min.css">
+
+  <link rel="preload" href="https://npm.webcache.cn/@fortawesome/fontawesome-free@6.5.1/css/brands.min.css" as="style" onload="this.onload&#x3D;null;this.rel&#x3D;&#39;stylesheet&#39;"><link rel="preload" href="https://npm.webcache.cn/@fortawesome/fontawesome-free@6.5.1/css/v5-font-face.min.css" as="style" onload="this.onload&#x3D;null;this.rel&#x3D;&#39;stylesheet&#39;"><link rel="preload" href="https://npm.webcache.cn/@fortawesome/fontawesome-free@6.5.1/css/v4-font-face.min.css" as="style" onload="this.onload&#x3D;null;this.rel&#x3D;&#39;stylesheet&#39;">
+  
+<link rel="stylesheet" href="/css/loader.css">
+
+  <meta name="description" content="RISCV-BOOM ICACHE 在RISCV-BOOM(2)中，我们对BOOM的前端代码(frontend.scala)进行了简要分析，发现除了F3内针对fetch_bundle的处理外，其余部分都在作为顶层模组，完成对各个子模组的连接。所以要真正理解前端的各种实现，我们还需要对各个子模组进行分析和理解。本文针对ICache进行分析，其代码为icache.scala。  代码分析  ICac">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RISCV-BOOM(3)">
+<meta property="og:url" content="https://taosicheng2001.github.io/2024/04/11/RISCV-BOOM-3/index.html">
+<meta property="og:site_name" content="ソラの小屋">
+<meta property="og:description" content="RISCV-BOOM ICACHE 在RISCV-BOOM(2)中，我们对BOOM的前端代码(frontend.scala)进行了简要分析，发现除了F3内针对fetch_bundle的处理外，其余部分都在作为顶层模组，完成对各个子模组的连接。所以要真正理解前端的各种实现，我们还需要对各个子模组进行分析和理解。本文针对ICache进行分析，其代码为icache.scala。  代码分析  ICac">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://taosicheng2001.github.io/images/sub-Banking.png">
+<meta property="og:image" content="https://taosicheng2001.github.io/images/horizontal-interleaving.png">
+<meta property="og:image" content="https://taosicheng2001.github.io/images/Interleaving.png">
+<meta property="article:published_time" content="2024-04-11T11:59:01.000Z">
+<meta property="article:modified_time" content="2024-05-05T15:00:58.487Z">
+<meta property="article:author" content="Sora">
+<meta property="article:tag" content="Code Reading">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://taosicheng2001.github.io/images/sub-Banking.png">
+  
+    <link rel="alternate" href="/atom.xml" title="ソラの小屋" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/images/sora_icon.ico">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
+
+  
+  
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/katex@0.16.9/dist/katex.min.css">
+
+  
+  
+  
+  
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js"></script>
+
+  
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/wowjs@1.1.3/css/libs/animate.css">
+
+    
+<script src="https://npm.webcache.cn/wowjs@1.1.3/dist/wow.min.js"></script>
+
+    <script>
+      new WOW({
+        offset: 0,
+        mobile: true,
+        live: false
+      }).init();
+    </script>
+  
+  
+    <script src="/sw.js"></script>
+  
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+  <body>
+    
+  <div id='loader'>
+    <div class="loading-left-bg"></div>
+    <div class="loading-right-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi">
+        <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+          <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="#ff6e6b" />
+          <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z" fill="#fd0d00" />
+          <path d="M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95" fill="#fd0d00" />
+        </svg>
+      </div>
+      <div class="loading-word">Loading...</div>
+    </div>
+  </div>
+  </div>
+  <script>
+    var time = null;
+    const startLoading = () => {
+      time = Date.now();
+      document.getElementById('loader').classList.remove("loading");
+    }
+    const endLoading = () => {
+      if (!time) {
+        document.body.style.overflow = 'auto';
+        document.getElementById('loader').classList.add("loading");
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          document.body.style.overflow = 'auto';
+          document.getElementById('loader').classList.add("loading");
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('load', endLoading);
+    document.getElementById('loader').addEventListener('click', endLoading);
+  </script>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav">
+    
+      <span class="main-nav-link-wrap">
+        <span class="main-nav-icon"></span>
+        <a class="main-nav-link" href="/">Home</a>
+      </span>
+    
+      <span class="main-nav-link-wrap">
+        <span class="main-nav-icon"></span>
+        <a class="main-nav-link" href="/archives">Archives</a>
+      </span>
+    
+      <span class="main-nav-link-wrap">
+        <span class="main-nav-icon"></span>
+        <a class="main-nav-link" href="/about">About</a>
+      </span>
+    
+      <span class="main-nav-link-wrap">
+        <span class="main-nav-icon"></span>
+        <a class="main-nav-link" href="/friend">Friend</a>
+      </span>
+    
+    <a id="main-nav-toggle" class="nav-icon"></a>
+  </nav>
+  <nav id="sub-nav">
+    
+      <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+    
+    
+    
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="Search"></a>
+    
+  </nav>
+</div>
+<header id="header">
+  
+    <img fetchpriority="high" src="/images/Night.jpg" alt="RISCV-BOOM(3)">
+  
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <div id="logo-wrap">
+        
+          
+          
+            <a href="/" id="logo">
+              <h1>RISCV-BOOM(3)</h1>
+            </a>
+          
+        
+      </div>
+      
+        
+        <h2 id="subtitle-wrap">
+          
+        </h2>
+      
+    </div>
+  </div>
+</header>
+
+        <div id="content" class="outer">
+          
+            <aside id="sidebar">
+  <div class="sidebar-wrap wow fadeInRight wrap-sticky">
+    
+      <div class="sidebar-toc-sidebar"><div class="sidebar-toc">
+  <h3 class="toc-title">Contents</h3>
+  <div class="sidebar-toc-wrapper"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#riscv-boom-icache"><span class="toc-number">1.</span> <span class="toc-text"> RISCV-BOOM ICACHE</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90"><span class="toc-number">1.1.</span> <span class="toc-text"> 代码分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#icache"><span class="toc-number">1.1.1.</span> <span class="toc-text"> ICache</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#icacheresp"><span class="toc-number">1.1.2.</span> <span class="toc-text"> ICacheResp</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#icache-bundle"><span class="toc-number">1.1.3.</span> <span class="toc-text"> ICache Bundle</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#icachemodule"><span class="toc-number">1.1.4.</span> <span class="toc-text"> ICacheModule</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#sub-banking-and-interleaving"><span class="toc-number">1.2.</span> <span class="toc-text"> Sub-Banking and interleaving</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">1.3.</span> <span class="toc-text"> 总结</span></a></li></ol></li></ol></div>
+</div>
+</div>
+      <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/sora.jpg" data-sizes="auto" alt="Sora" class="lazyload">
+  <div class="sidebar-author-name">Sora</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>Posts</div>
+    <div class="sidebar-state-number">6</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>Categories</div>
+    <div class="sidebar-state-number">5</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>Tags</div>
+    <div class="sidebar-state-number">4</div>
+  </div>
+</div>
+<div class="sidebar-social">
+  
+</div>
+<div class="sidebar-menu">
+  
+    <div class="sidebar-menu-link-wrap">
+      <a class="sidebar-menu-link-dummy" href="/" aria-label="Home"></a>
+      <span class="sidebar-menu-icon"></span>
+      <div class="sidebar-menu-link">Home</div>
+    </div>
+  
+    <div class="sidebar-menu-link-wrap">
+      <a class="sidebar-menu-link-dummy" href="/archives" aria-label="Archives"></a>
+      <span class="sidebar-menu-icon"></span>
+      <div class="sidebar-menu-link">Archives</div>
+    </div>
+  
+    <div class="sidebar-menu-link-wrap">
+      <a class="sidebar-menu-link-dummy" href="/about" aria-label="About"></a>
+      <span class="sidebar-menu-icon"></span>
+      <div class="sidebar-menu-link">About</div>
+    </div>
+  
+    <div class="sidebar-menu-link-wrap">
+      <a class="sidebar-menu-link-dummy" href="/friend" aria-label="Friend"></a>
+      <span class="sidebar-menu-icon"></span>
+      <div class="sidebar-menu-link">Friend</div>
+    </div>
+  
+</div>
+</div>
+    
+    
+      <div class="sidebar-btn-wrapper" style="position:static">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+    
+  </div>
+
+  
+</aside>
+
+          
+          <section id="main"><article id="post-RISCV-BOOM-3" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner">
+    <div class="article-meta">
+      <div class="article-date wow slideInLeft">
+  <a href="/2024/04/11/RISCV-BOOM-3/" class="article-date-link">
+    <time datetime="2024-04-11T11:59:01.000Z" itemprop="datePublished">2024-04-11</time>
+  </a>
+</div>
+
+      
+  <div class="article-category wow slideInLeft">
+    <a class="article-category-link" href="/categories/Computer-Architecture/">Computer Architecture</a><a class="article-category-link" href="/categories/Computer-Architecture/RISCV-BOOM/">RISCV-BOOM</a>
+  </div>
+
+
+    </div>
+    <div class="hr-line"></div>
+    
+
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="riscv-boom-icache"><a class="markdownIt-Anchor" href="#riscv-boom-icache"></a> RISCV-BOOM ICACHE</h1>
+<p>在RISCV-BOOM(2)中，我们对BOOM的前端代码(<code>frontend.scala</code>)进行了简要分析，发现除了F3内针对<code>fetch_bundle</code>的处理外，其余部分都在作为顶层模组，完成对各个子模组的连接。所以要真正理解前端的各种实现，我们还需要对各个子模组进行分析和理解。本文针对ICache进行分析，其代码为<code>icache.scala</code>。</p>
+<h2 id="代码分析"><a class="markdownIt-Anchor" href="#代码分析"></a> 代码分析</h2>
+<h3 id="icache"><a class="markdownIt-Anchor" href="#icache"></a> <code>ICache</code></h3>
+<p>包装了<code>ICache Module</code>实例化的类，通过调整传入参数<code>icacheParams</code>可进行快速配置。在实例化<code>ICacheModule</code>的同时，也设置了<code>masterNode</code>，这是片上互联的一种节点。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * ICache module</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @param icacheParams parameters for the icache</span></span><br><span class="line"><span class="comment"> * @param hartId the id of the hardware thread in the cache</span></span><br><span class="line"><span class="comment"> * @param enableBlackBox use a blackbox icache</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ICache</span>(<span class="params"></span></span></span><br><span class="line"><span class="params"><span class="class">  val icacheParams: <span class="type">ICacheParams</span>,</span></span></span><br><span class="line"><span class="params"><span class="class">  val staticIdForMetadataUseOnly: <span class="type">Int</span></span>)(<span class="params">implicit p: <span class="type">Parameters</span></span>)</span></span><br><span class="line">  <span class="keyword">extends</span> <span class="type">LazyModule</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">lazy</span> <span class="keyword">val</span> module = <span class="keyword">new</span> <span class="type">ICacheModule</span>(<span class="keyword">this</span>)</span><br><span class="line">  <span class="keyword">val</span> masterNode = <span class="type">TLClientNode</span>(<span class="type">Seq</span>(<span class="type">TLMasterPortParameters</span>.v1(<span class="type">Seq</span>(<span class="type">TLMasterParameters</span>.v1(</span><br><span class="line">    sourceId = <span class="type">IdRange</span>(<span class="number">0</span>, <span class="number">1</span> + icacheParams.prefetch.toInt), <span class="comment">// 0=refill, 1=hint</span></span><br><span class="line">    name = <span class="string">s&quot;Core <span class="subst">$&#123;staticIdForMetadataUseOnly&#125;</span> ICache&quot;</span>)))))</span><br><span class="line"></span><br><span class="line">  <span class="keyword">val</span> size = icacheParams.nSets * icacheParams.nWays * icacheParams.blockBytes</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">val</span> wordBytes = icacheParams.fetchBytes</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="icacheresp"><a class="markdownIt-Anchor" href="#icacheresp"></a> <code>ICacheResp</code></h3>
+<p>离开ICache的IO信号(ICache返回到Frontend的信号)</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ICacheResp</span>(<span class="params">val outer: <span class="type">ICache</span></span>) <span class="keyword">extends</span> <span class="title">Bundle</span></span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">val</span> data = <span class="type">UInt</span>((outer.icacheParams.fetchBytes*<span class="number">8</span>).<span class="type">W</span>)</span><br><span class="line">  <span class="keyword">val</span> replay = <span class="type">Bool</span>()</span><br><span class="line">  <span class="keyword">val</span> ae = <span class="type">Bool</span>() <span class="comment">// Access Exception</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="icache-bundle"><a class="markdownIt-Anchor" href="#icache-bundle"></a> <code>ICache Bundle</code></h3>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ICacheBundle</span>(<span class="params">val outer: <span class="type">ICache</span></span>) <span class="keyword">extends</span> <span class="title">BoomBundle</span>(<span class="params"></span>)(<span class="params">outer.p</span>)</span></span><br><span class="line">  <span class="keyword">with</span> <span class="type">HasBoomFrontendParameters</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">val</span> req = <span class="type">Flipped</span>(<span class="type">Decoupled</span>(<span class="keyword">new</span> <span class="type">ICacheReq</span>)) <span class="comment">// Decoupled是生产者——消费者数据传输模型接口，具有valid, bits. ready这三个信号。 这个接口是站在数据传输者的角度定义数据传输方向的</span></span><br><span class="line">  <span class="comment">// Flipped将该数据传输方向翻转</span></span><br><span class="line">  <span class="comment">// 两者结合后，该数据传输方向为外到内</span></span><br><span class="line">  <span class="keyword">val</span> s1_paddr = <span class="type">Input</span>(<span class="type">UInt</span>(paddrBits.<span class="type">W</span>)) <span class="comment">// delayed one cycle w.r.t. req</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">val</span> s1_kill = <span class="type">Input</span>(<span class="type">Bool</span>()) <span class="comment">// delayed one cycle w.r.t. req</span></span><br><span class="line">  <span class="keyword">val</span> s2_kill = <span class="type">Input</span>(<span class="type">Bool</span>()) <span class="comment">// delayed two cycles; prevents I$ miss emission</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">val</span> resp = <span class="type">Valid</span>(<span class="keyword">new</span> <span class="type">ICacheResp</span>(outer)) <span class="comment">// Valid会生成一个新Bundle,带有valid和bits这两个信号</span></span><br><span class="line">  <span class="keyword">val</span> invalidate = <span class="type">Input</span>(<span class="type">Bool</span>())</span><br><span class="line"></span><br><span class="line">  <span class="keyword">val</span> perf = <span class="type">Output</span>(<span class="keyword">new</span> <span class="type">Bundle</span> &#123;</span><br><span class="line">    <span class="keyword">val</span> acquire = <span class="type">Bool</span>()</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="icachemodule"><a class="markdownIt-Anchor" href="#icachemodule"></a> <code>ICacheModule</code></h3>
+<p>实际实现功能的类，定义了ICache内部信号的生成和传输。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ICacheModule</span>(<span class="params">outer: <span class="type">ICache</span></span>) <span class="keyword">extends</span> <span class="title">LazyModuleImp</span>(<span class="params">outer</span>)</span></span><br><span class="line">  <span class="keyword">with</span> <span class="type">HasBoomFrontendParameters</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">val</span> enableICacheDelay = tileParams.core.asInstanceOf[<span class="type">BoomCoreParams</span>].enableICacheDelay</span><br><span class="line">  <span class="keyword">val</span> io = <span class="type">IO</span>(<span class="keyword">new</span> <span class="type">ICacheBundle</span>(outer))</span><br><span class="line">  <span class="keyword">val</span> (tl_out, edge_out) = outer.masterNode.out(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">  require(isPow2(nSets) &amp;&amp; isPow2(nWays))</span><br><span class="line">  require(usingVM)</span><br><span class="line">  require(pgIdxBits &gt;= untagBits)</span><br><span class="line"></span><br><span class="line">  <span class="comment">// How many bits do we intend to fetch at most every cycle?</span></span><br><span class="line">  <span class="keyword">val</span> wordBits = outer.icacheParams.fetchBytes*<span class="number">8</span>  <span class="comment">// fetchBytes = 8</span></span><br><span class="line">  <span class="comment">// Each of these cases require some special-case handling.</span></span><br><span class="line">  require (tl_out.d.bits.data.getWidth == wordBits || (<span class="number">2</span>*tl_out.d.bits.data.getWidth == wordBits &amp;&amp; nBanks == <span class="number">2</span>))</span><br><span class="line">  <span class="comment">// If TL refill is half the wordBits size and we have two banks, then the</span></span><br><span class="line">  <span class="comment">// refill writes to only one bank per cycle (instead of across two banks every</span></span><br><span class="line">  <span class="comment">// cycle).</span></span><br><span class="line">  <span class="keyword">val</span> refillsToOneBank = (<span class="number">2</span>*tl_out.d.bits.data.getWidth == wordBits)</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// nWays = 4; nSets = 64</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">val</span> s0_valid = io.req.fire <span class="comment">// fire信号是valid &amp; ready, 来自frontend的fire </span></span><br><span class="line">  <span class="keyword">val</span> s0_vaddr = io.req.bits.addr <span class="comment">// 传入VA</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">val</span> s1_valid = <span class="type">RegNext</span>(s0_valid)</span><br><span class="line">  <span class="keyword">val</span> s1_tag_hit = <span class="type">Wire</span>(<span class="type">Vec</span>(nWays, <span class="type">Bool</span>()))</span><br><span class="line">  <span class="keyword">val</span> s1_hit = s1_tag_hit.reduce(_||_)</span><br><span class="line">  <span class="keyword">val</span> s2_valid = <span class="type">RegNext</span>(s1_valid &amp;&amp; !io.s1_kill)</span><br><span class="line">  <span class="keyword">val</span> s2_hit = <span class="type">RegNext</span>(s1_hit)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  <span class="keyword">val</span> invalidated = <span class="type">Reg</span>(<span class="type">Bool</span>())</span><br><span class="line">  <span class="keyword">val</span> refill_valid = <span class="type">RegInit</span>(<span class="literal">false</span>.<span class="type">B</span>)</span><br><span class="line">  <span class="keyword">val</span> refill_fire = tl_out.a.fire</span><br><span class="line">  <span class="keyword">val</span> s2_miss = s2_valid &amp;&amp; !s2_hit &amp;&amp; !<span class="type">RegNext</span>(refill_valid)</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Refill Sign</span></span><br><span class="line">  <span class="keyword">val</span> refill_paddr = <span class="type">RegEnable</span>(io.s1_paddr, s1_valid &amp;&amp; !(refill_valid || s2_miss)) <span class="comment">// RegEnable(nextVal, ena)</span></span><br><span class="line">  <span class="comment">// untagBits = blockOffBits + idxBits</span></span><br><span class="line">  <span class="keyword">val</span> refill_tag = refill_paddr(tagBits+untagBits<span class="number">-1</span>,untagBits)</span><br><span class="line">  <span class="keyword">val</span> refill_idx = refill_paddr(untagBits<span class="number">-1</span>,blockOffBits)</span><br><span class="line">  <span class="keyword">val</span> refill_one_beat = tl_out.d.fire &amp;&amp; edge_out.hasData(tl_out.d.bits) <span class="comment">// 通过TileLink节点连接下层存储</span></span><br><span class="line"></span><br><span class="line">  io.req.ready := !refill_one_beat <span class="comment">// ready的前提是没有refill_one_beat</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">val</span> (_, _, d_done, refill_cnt) = edge_out.count(tl_out.d)</span><br><span class="line">  <span class="keyword">val</span> refill_done = refill_one_beat &amp;&amp; d_done</span><br><span class="line">  tl_out.d.ready := <span class="literal">true</span>.<span class="type">B</span></span><br><span class="line">  require (edge_out.manager.minLatency &gt; <span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">val</span> repl_way = <span class="keyword">if</span> (isDM) <span class="number">0.</span><span class="type">U</span> <span class="keyword">else</span> <span class="type">LFSR</span>(<span class="number">16</span>, refill_fire)(log2Ceil(nWays)<span class="number">-1</span>,<span class="number">0</span>) <span class="comment">// Replace_Way;  LFSR(width, increment_Ena) 产生随机数</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">/*</span></span><br><span class="line"><span class="comment">        way0  ...   way15</span></span><br><span class="line"><span class="comment">    |---------|---------|  set0 </span></span><br><span class="line"><span class="comment">    |---------|---------|  set1</span></span><br><span class="line"><span class="comment">    |---------|---------|  ...</span></span><br><span class="line"><span class="comment">    |---------|---------|  set63</span></span><br><span class="line"><span class="comment">    |-------------------|  </span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line">  <span class="keyword">val</span> tag_array = <span class="type">SyncReadMem</span>(nSets, <span class="type">Vec</span>(nWays, <span class="type">UInt</span>(tagBits.<span class="type">W</span>))) <span class="comment">// 存储Tag的阵列,SyncReadMem(sizeNumber, dataType), Vec(sizeNumber, dataType)</span></span><br><span class="line">  <span class="keyword">val</span> tag_rdata = tag_array.read(s0_vaddr(untagBits<span class="number">-1</span>, blockOffBits), !refill_done &amp;&amp; s0_valid) <span class="comment">// 用index索引set去读Tag_array,得到nWay个Tag； 函数调用read(index, ena)</span></span><br><span class="line">  when (refill_done) &#123;</span><br><span class="line">    tag_array.write(refill_idx, <span class="type">VecInit</span>(<span class="type">Seq</span>.fill(nWays)(refill_tag)), <span class="type">Seq</span>.tabulate(nWays)(repl_way === _.<span class="type">U</span>)) </span><br><span class="line">    <span class="comment">// 函数调用 write(index, data, mask) </span></span><br><span class="line">    <span class="comment">// 函数调用 Seq.fill(number)(genElement) </span></span><br><span class="line">    <span class="comment">// 函数调用 Seq.tabulate(number)(genFunc)</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">val</span> vb_array = <span class="type">RegInit</span>(<span class="number">0.</span><span class="type">U</span>((nSets*nWays).<span class="type">W</span>)) <span class="comment">// valid_bit_array</span></span><br><span class="line">  when (refill_one_beat) &#123;</span><br><span class="line">    vb_array := vb_array.bitSet(<span class="type">Cat</span>(repl_way, refill_idx), refill_done &amp;&amp; !invalidated)</span><br><span class="line">    <span class="comment">// 函数调用 bitSet(index, bool_value)</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  when (io.invalidate) &#123;</span><br><span class="line">    vb_array := <span class="number">0.</span><span class="type">U</span></span><br><span class="line">    invalidated := <span class="literal">true</span>.<span class="type">B</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">val</span> s2_dout   = <span class="type">Wire</span>(<span class="type">Vec</span>(nWays, <span class="type">UInt</span>(wordBits.<span class="type">W</span>)))</span><br><span class="line">  <span class="keyword">val</span> s1_bankid = <span class="type">Wire</span>(<span class="type">Bool</span>())</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 计算tag_hit</span></span><br><span class="line">  <span class="keyword">for</span> (i &lt;- <span class="number">0</span> until nWays) &#123;</span><br><span class="line">    <span class="keyword">val</span> s1_idx = io.s1_paddr(untagBits<span class="number">-1</span>,blockOffBits) <span class="comment">// 感觉这个s1_idx没啥必要</span></span><br><span class="line">    <span class="keyword">val</span> s1_tag = io.s1_paddr(tagBits+untagBits<span class="number">-1</span>,untagBits)</span><br><span class="line">    <span class="keyword">val</span> s1_vb = vb_array(<span class="type">Cat</span>(i.<span class="type">U</span>, s1_idx))</span><br><span class="line">    <span class="keyword">val</span> tag = tag_rdata(i)</span><br><span class="line">    s1_tag_hit(i) := s1_vb &amp;&amp; tag === s1_tag</span><br><span class="line">  &#125;</span><br><span class="line">  assert(<span class="type">PopCount</span>(s1_tag_hit) &lt;= <span class="number">1.</span><span class="type">U</span> || !s1_valid) <span class="comment">// 最多只有一路命中</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  <span class="comment">// 这里还考虑了refill的周期数，利用refill_cnt把不同cnt下的值都保存</span></span><br><span class="line">  <span class="keyword">val</span> ramDepth = <span class="keyword">if</span> (refillsToOneBank &amp;&amp; nBanks == <span class="number">2</span>) &#123;</span><br><span class="line">    nSets * refillCycles / <span class="number">2</span></span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    nSets * refillCycles</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// dataArrays[wayIndex][setIndex]</span></span><br><span class="line">  <span class="keyword">val</span> dataArrays = <span class="keyword">if</span> (nBanks == <span class="number">1</span>) &#123;</span><br><span class="line">    <span class="comment">// Use unbanked icache for narrow accesses.</span></span><br><span class="line">    <span class="comment">// 这里的dataArray是具有nWays个元素的map，每个元素是一个SyncReadMem，深度为wordBits</span></span><br><span class="line">    (<span class="number">0</span> until nWays).map &#123; x =&gt;</span><br><span class="line">      <span class="type">DescribedSRAM</span>(</span><br><span class="line">        name = <span class="string">s&quot;dataArrayWay_<span class="subst">$&#123;x&#125;</span>&quot;</span>,</span><br><span class="line">        desc = <span class="string">&quot;ICache Data Array&quot;</span>,</span><br><span class="line">        size = ramDepth,</span><br><span class="line">        data = <span class="type">UInt</span>((wordBits).<span class="type">W</span>)</span><br><span class="line">      )</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// Use two banks, interleaved. 分双bank,多体交叉编址</span></span><br><span class="line">    <span class="comment">// 这里的dataArray是具有nWays+nWays个元素的map，每个元素是一个SyncReadMem，深度为wordBits/nBanks</span></span><br><span class="line"></span><br><span class="line">    (<span class="number">0</span> until nWays).map &#123; x =&gt;</span><br><span class="line">      <span class="type">DescribedSRAM</span>(</span><br><span class="line">        name = <span class="string">s&quot;dataArrayB0Way_<span class="subst">$&#123;x&#125;</span>&quot;</span>,</span><br><span class="line">        desc = <span class="string">&quot;ICache Data Array&quot;</span>,</span><br><span class="line">        size = ramDepth,</span><br><span class="line">        data = <span class="type">UInt</span>((wordBits/nBanks).<span class="type">W</span>)</span><br><span class="line">      )&#125; ++</span><br><span class="line">    (<span class="number">0</span> until nWays).map &#123; x =&gt;</span><br><span class="line">      <span class="type">DescribedSRAM</span>(</span><br><span class="line">        name = <span class="string">s&quot;dataArrayB1Way_<span class="subst">$&#123;x&#125;</span>&quot;</span>,</span><br><span class="line">        desc = <span class="string">&quot;ICache Data Array&quot;</span>,</span><br><span class="line">        size = ramDepth,</span><br><span class="line">        data = <span class="type">UInt</span>((wordBits/nBanks).<span class="type">W</span>)</span><br><span class="line">      )&#125;</span><br><span class="line">  &#125;</span><br><span class="line">    </span><br><span class="line">  <span class="comment">/*  </span></span><br><span class="line"><span class="comment">      MSB                                    LSB</span></span><br><span class="line"><span class="comment">       [ tagBits ][ indexBits ][ blockOffBits ] paddr，传入Icache的物理地址</span></span><br><span class="line"><span class="comment">                  [ indexBits ]                 refill_idx对应的字段</span></span><br><span class="line"><span class="comment">        [ indexBits ][  lgRC  ][ blockOffBits ] 不分Bank的dataArrays[x_Ways]的寻址模式，这里的lgRC是log2Ceil(refillCycles);</span></span><br><span class="line"><span class="comment">                  [     row    [  lgRC  ]]      不分bank下row对应的字段(截取vaddr)</span></span><br><span class="line"><span class="comment">          [ indexBits ][lgRC-1][ blockOffBits ] 分Bank的dataArraysBx[x_Ways] 里面的寻址模式;整体容量小了一半</span></span><br><span class="line"><span class="comment">                  [    b0row   [lgRC-1]]        分bank下bxrow(refillsToOneBank)对应的字段(截取vaddr)</span></span><br><span class="line"><span class="comment">                  [   b0row    [  lgRC  ]]      分bank下bxrow(!refillsToOneBank)对应的字段(截取vaddr)</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (nBanks == <span class="number">1</span>) &#123;</span><br><span class="line">    <span class="comment">// Use unbanked icache for narrow accesses.</span></span><br><span class="line">    s1_bankid := <span class="number">0.</span><span class="type">U</span></span><br><span class="line">    <span class="keyword">for</span> ((dataArray, i) &lt;- dataArrays.zipWithIndex) &#123;</span><br><span class="line">      <span class="comment">// 函数调用 zipWithIndex 返回列表元素和其下标 [(ele0, 0), (ele1, 1), ..., (elen, n)]</span></span><br><span class="line">      <span class="comment">// 这里返回nWays个元素，每个元素是一个SyncReadMem</span></span><br><span class="line">      <span class="function"><span class="keyword">def</span> <span class="title">row</span></span>(addr: <span class="type">UInt</span>) = addr(untagBits<span class="number">-1</span>, blockOffBits-log2Ceil(refillCycles))</span><br><span class="line">      <span class="keyword">val</span> s0_ren = s0_valid</span><br><span class="line"></span><br><span class="line">      <span class="keyword">val</span> wen = (refill_one_beat &amp;&amp; !invalidated) &amp;&amp; repl_way === i.<span class="type">U</span></span><br><span class="line"></span><br><span class="line">      <span class="keyword">val</span> mem_idx = <span class="type">Mux</span>(refill_one_beat, (refill_idx &lt;&lt; log2Ceil(refillCycles)) | refill_cnt,</span><br><span class="line">                    row(s0_vaddr))</span><br><span class="line">      <span class="comment">// refill_idx 用的是paddr</span></span><br><span class="line">      <span class="comment">// s0_vaddr   用的是vaddr</span></span><br><span class="line"></span><br><span class="line">      when (wen) &#123;</span><br><span class="line">        dataArray.write(mem_idx, tl_out.d.bits.data)</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">if</span> (enableICacheDelay)</span><br><span class="line">        s2_dout(i) := dataArray.read(<span class="type">RegNext</span>(mem_idx), <span class="type">RegNext</span>(!wen &amp;&amp; s0_ren)) <span class="comment">// 下一拍才读dataArray</span></span><br><span class="line">      <span class="keyword">else</span></span><br><span class="line">        s2_dout(i) := <span class="type">RegNext</span>(dataArray.read(mem_idx, !wen &amp;&amp; s0_ren)) <span class="comment">// 这一拍读dataArray,下一拍送出来</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// Use two banks, interleaved.</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> dataArraysB0 = dataArrays.take(nWays) <span class="comment">// 取出前面nWays个元素放入新Map</span></span><br><span class="line">    <span class="keyword">val</span> dataArraysB1 = dataArrays.drop(nWays) <span class="comment">// 把前面nWays个元素删除，留下后nWays个元素</span></span><br><span class="line">    require (nBanks == <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Bank0 row&#x27;s id wraps around if Bank1 is the starting bank.</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">b0Row</span></span>(addr: <span class="type">UInt</span>) =</span><br><span class="line">      <span class="keyword">if</span> (refillsToOneBank) &#123;</span><br><span class="line">        addr(untagBits<span class="number">-1</span>, blockOffBits-log2Ceil(refillCycles)+<span class="number">1</span>) + bank(addr)</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        addr(untagBits<span class="number">-1</span>, blockOffBits-log2Ceil(refillCycles)) + bank(addr)</span><br><span class="line">      &#125;</span><br><span class="line">    <span class="comment">// Bank1 row&#x27;s id stays the same regardless of which Bank has the fetch address.</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">b1Row</span></span>(addr: <span class="type">UInt</span>) =</span><br><span class="line">      <span class="keyword">if</span> (refillsToOneBank) &#123;</span><br><span class="line">        addr(untagBits<span class="number">-1</span>, blockOffBits-log2Ceil(refillCycles)+<span class="number">1</span>)</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        addr(untagBits<span class="number">-1</span>, blockOffBits-log2Ceil(refillCycles))</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">    s1_bankid := <span class="type">RegNext</span>(bank(s0_vaddr))</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (i &lt;- <span class="number">0</span> until nWays) &#123;</span><br><span class="line">      </span><br><span class="line">      <span class="comment">// [ tagBits ][ indexBits ][ blockOffBits ] paddr，传入Icache的物理地址</span></span><br><span class="line">      <span class="comment">//    [ indexBits ][lgRC-1][ blockOffBits ] 分Bank的dataArraysBx[x_Ways] 里面的寻址模式</span></span><br><span class="line">      <span class="comment">//  [ indexBits ][ lgRC ]                   refill_idx &lt;&lt; log2Ceil(refillCycles) | refill_cnt对应的字段</span></span><br><span class="line">      </span><br><span class="line">      <span class="keyword">val</span> s0_ren = s0_valid</span><br><span class="line">      <span class="keyword">val</span> wen = (refill_one_beat &amp;&amp; !invalidated)&amp;&amp; repl_way === i.<span class="type">U</span></span><br><span class="line"></span><br><span class="line">      <span class="keyword">var</span> mem_idx0: <span class="type">UInt</span> = <span class="literal">null</span></span><br><span class="line">      <span class="keyword">var</span> mem_idx1: <span class="type">UInt</span> = <span class="literal">null</span></span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (refillsToOneBank) &#123;</span><br><span class="line">        <span class="comment">// write a refill beat across only one beat.</span></span><br><span class="line">        mem_idx0 =</span><br><span class="line">          <span class="type">Mux</span>(refill_one_beat, (refill_idx &lt;&lt; (log2Ceil(refillCycles)<span class="number">-1</span>)) | (refill_cnt &gt;&gt; <span class="number">1.</span><span class="type">U</span>),</span><br><span class="line">          b0Row(s0_vaddr))</span><br><span class="line">        mem_idx1 =</span><br><span class="line">          <span class="type">Mux</span>(refill_one_beat, (refill_idx &lt;&lt; (log2Ceil(refillCycles)<span class="number">-1</span>)) | (refill_cnt &gt;&gt; <span class="number">1.</span><span class="type">U</span>),</span><br><span class="line">          b1Row(s0_vaddr))</span><br><span class="line"></span><br><span class="line">        <span class="comment">// cnt最低位指定使用哪一个bank</span></span><br><span class="line">        when (wen &amp;&amp; refill_cnt(<span class="number">0</span>) === <span class="number">0.</span><span class="type">U</span>) &#123;</span><br><span class="line">          dataArraysB0(i).write(mem_idx0, tl_out.d.bits.data)</span><br><span class="line">        &#125;</span><br><span class="line">        when (wen &amp;&amp; refill_cnt(<span class="number">0</span>) === <span class="number">1.</span><span class="type">U</span>) &#123;</span><br><span class="line">          dataArraysB1(i).write(mem_idx1, tl_out.d.bits.data)</span><br><span class="line">        &#125;</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// write a refill beat across both banks.</span></span><br><span class="line">        <span class="comment">// 此时refill_idx的最高位被截断</span></span><br><span class="line"></span><br><span class="line">        mem_idx0 =</span><br><span class="line">          <span class="type">Mux</span>(refill_one_beat, (refill_idx &lt;&lt; log2Ceil(refillCycles)) | refill_cnt,</span><br><span class="line">          b0Row(s0_vaddr))</span><br><span class="line">        mem_idx1 =</span><br><span class="line">          <span class="type">Mux</span>(refill_one_beat, (refill_idx &lt;&lt; log2Ceil(refillCycles)) | refill_cnt,</span><br><span class="line">          b1Row(s0_vaddr))</span><br><span class="line"></span><br><span class="line">        when (wen) &#123;</span><br><span class="line">          <span class="keyword">val</span> data = tl_out.d.bits.data</span><br><span class="line">          dataArraysB0(i).write(mem_idx0, data(wordBits/<span class="number">2</span><span class="number">-1</span>, <span class="number">0</span>))</span><br><span class="line">          dataArraysB1(i).write(mem_idx1, data(wordBits<span class="number">-1</span>, wordBits/<span class="number">2</span>))</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">if</span> (enableICacheDelay) &#123;</span><br><span class="line">        s2_dout(i) := <span class="type">Cat</span>(dataArraysB1(i).read(<span class="type">RegNext</span>(mem_idx1), <span class="type">RegNext</span>(!wen &amp;&amp; s0_ren)),</span><br><span class="line">                          dataArraysB0(i).read(<span class="type">RegNext</span>(mem_idx0), <span class="type">RegNext</span>(!wen &amp;&amp; s0_ren)))</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        s2_dout(i) := <span class="type">RegNext</span>(<span class="type">Cat</span>(dataArraysB1(i).read(mem_idx1, !wen &amp;&amp; s0_ren),</span><br><span class="line">                                  dataArraysB0(i).read(mem_idx0, !wen &amp;&amp; s0_ren)))</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">val</span> s2_tag_hit = <span class="type">RegNext</span>(s1_tag_hit)</span><br><span class="line">  <span class="keyword">val</span> s2_hit_way = <span class="type">OHToUInt</span>(s2_tag_hit) <span class="comment">// One-hot Vec to UInt</span></span><br><span class="line">  <span class="keyword">val</span> s2_bankid = <span class="type">RegNext</span>(s1_bankid)</span><br><span class="line">  <span class="keyword">val</span> s2_way_mux = <span class="type">Mux1H</span>(s2_tag_hit, s2_dout) <span class="comment">// Mux select valid dout</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">val</span> s2_unbanked_data = s2_way_mux</span><br><span class="line">  <span class="keyword">val</span> sz = s2_way_mux.getWidth</span><br><span class="line">  <span class="keyword">val</span> s2_bank0_data = s2_way_mux(sz/<span class="number">2</span><span class="number">-1</span>,<span class="number">0</span>)</span><br><span class="line">  <span class="keyword">val</span> s2_bank1_data = s2_way_mux(sz<span class="number">-1</span>,sz/<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 调整顺序，拼接出返回值</span></span><br><span class="line">  <span class="keyword">val</span> s2_data =</span><br><span class="line">    <span class="keyword">if</span> (nBanks == <span class="number">2</span>) &#123;</span><br><span class="line">      <span class="type">Mux</span>(s2_bankid,</span><br><span class="line">        <span class="type">Cat</span>(s2_bank0_data, s2_bank1_data),</span><br><span class="line">        <span class="type">Cat</span>(s2_bank1_data, s2_bank0_data))</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      s2_unbanked_data</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  io.resp.bits.ae := <span class="type">DontCare</span></span><br><span class="line">  io.resp.bits.replay := <span class="type">DontCare</span></span><br><span class="line">  io.resp.bits.data := s2_data</span><br><span class="line">  io.resp.valid := s2_valid &amp;&amp; s2_hit</span><br><span class="line"></span><br><span class="line">  tl_out.a.valid := s2_miss &amp;&amp; !refill_valid &amp;&amp; !io.s2_kill</span><br><span class="line">  tl_out.a.bits := edge_out.<span class="type">Get</span>(</span><br><span class="line">    fromSource = <span class="number">0.</span><span class="type">U</span>,</span><br><span class="line">    toAddress = (refill_paddr &gt;&gt; blockOffBits) &lt;&lt; blockOffBits,</span><br><span class="line">    lgSize = lgCacheBlockBytes.<span class="type">U</span>)._2</span><br><span class="line">  tl_out.b.ready := <span class="literal">true</span>.<span class="type">B</span></span><br><span class="line">  tl_out.c.valid := <span class="literal">false</span>.<span class="type">B</span></span><br><span class="line">  tl_out.e.valid := <span class="literal">false</span>.<span class="type">B</span></span><br><span class="line"></span><br><span class="line">  io.perf.acquire := tl_out.a.fire</span><br><span class="line"></span><br><span class="line">  when (!refill_valid) &#123; invalidated := <span class="literal">false</span>.<span class="type">B</span> &#125; <span class="comment">// refill_valid 则 invalidated</span></span><br><span class="line">  when (refill_fire) &#123; refill_valid := <span class="literal">true</span>.<span class="type">B</span> &#125;   <span class="comment">// refill_fire 则 refill_valid</span></span><br><span class="line">  when (refill_done) &#123; refill_valid := <span class="literal">false</span>.<span class="type">B</span> &#125;  <span class="comment">// refill_done 则 !refill_valid</span></span><br></pre></td></tr></table></figure>
+<h2 id="sub-banking-and-interleaving"><a class="markdownIt-Anchor" href="#sub-banking-and-interleaving"></a> Sub-Banking and interleaving</h2>
+<p>Sub-Banking(Multi-Banking)设计最早用于减少能耗，将<code>data memory array</code>分解为多个独立的bank，原来需要访问一个BlockSize大小的数据，现在只需要访问BlockSize/nBank大小的数据，能耗降低为原来的1/nBank。架构图如下所示:<br />
+<img src="/images/sub-Banking.png" alt="" /><br />
+在此基础上，在Multi-Bank的Cache上进行交叉编址，就可以实现对外提供多端口的Multi-port Cache(MB)。如果划分为C个bank,那么这样设计的Cache可以对外同时提供C次命中，从而提高了Cache的带宽。因为对于处理器而言，这些Cache Bank是同步可见的，对这些Cache Bank的读操作也是同步的。这意味着在一个周期内，处理器可以用多个读操作去同时访问这些Bank内的Cache Line。这种实现被称为水平交叠。<br />
+<img src="/images/horizontal-interleaving.png" alt="horizontal interleaving" /><br />
+Cache Line interleaving 的根本问题是：在Multi-Banking的Cache上，每个CacheLine(CacheBlock)放置在哪一个Bank内？假设地址的<code>Index</code>为<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span></span></span></span>位，那么在未分Bank的Cache设计中，共有<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mo>=</mo><msup><mn>2</mn><mi>N</mi></msup></mrow><annotation encoding="application/x-tex">L=2^N</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathnormal">L</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8413309999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413309999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.10903em;">N</span></span></span></span></span></span></span></span></span></span></span>个CacheLine。我们有多种切分Bank的方法，分别如b,c,d所示。</p>
+<ol>
+<li>( b )图，按Index的最高位(Index[N-1])进行分割。此时Index[N-1]决定使用哪一个Bank，Index[N-2,0]在Bank内进行索引。在这种分Bank设计下，除了4个边界CacheLine，Index为X的CacheLine在同一个Bank中与Indedx为X+1,X-1的CacheLine相邻。</li>
+<li>( c )图，按Index的最低位(Index[0])进行分割。此时Index[0]决定使用哪一个Bank，Inde[N-1,1]在Bank内进行索引。在这种分Bank设计下，Index为X的CacheLinie和Index为X+1,X-1的CacheLine一定位于不同的两个Bank上。</li>
+<li>( d )图，按Index[1]进行分割。分析类似，省略。<br />
+我们把第2种交叉编制方案( c )图称为垂直交叠<br />
+<img src="/images/Interleaving.png" alt="Interleaving" /></li>
+</ol>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>BOOM的ICache采用了分Bank技术（也可以配置为不分Bank），目前的框架只支持分为2个Bank。在该ICache的设计中，在TL refill的时候，不同refill_cnt会保存到不同的dataArray地址处，Refill的机制需要在TlieLink中学习。其次，在寻址Mem_idx的时候，同时使用到了vaddr和paddr,这一部分内容需要在TLB中学习。最让人迷惑的就是Mem_idx的生成，由于其牵扯到Refill机制和虚实地址，需要了解这两部分的内容后再进行理解。</p>
+<p><strong>以上です。</strong></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://taosicheng2001.github.io/2024/04/11/RISCV-BOOM-3/" data-id="clynteaze0007u5sba7548ime" data-title="RISCV-BOOM(3)" class="article-share-link">Share</a>
+      
+      
+      
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Code-Reading/" rel="tag">Code Reading</a></li></ul>
+
+
+    </footer>
+  </div>
+  
+    
+  <nav id="article-nav" class="wow fadeInUp">
+    
+      <div class="article-nav-link-wrap article-nav-link-left">
+        
+          
+          
+            <img data-src="/covers/Night2.jpg" data-sizes="auto" alt="Hello World" class="lazyload">
+          
+        
+        <a href="/2024/05/05/hello-world/"></a>
+        <div class="article-nav-caption">Newer</div>
+        <h3 class="article-nav-title">
+          
+            Hello World
+          
+        </h3>
+      </div>
+    
+    
+    <div class="article-nav-link-wrap article-nav-link-right">
+      
+        
+        
+          <img data-src="/covers/Night.jpg" data-sizes="auto" alt="RISCV-BOOM(2)" class="lazyload">
+        
+      
+      <a href="/2024/04/07/RISCV-BOOM-2/"></a>
+      <div class="article-nav-caption">Older</div>
+      <h3 class="article-nav-title">
+        
+          RISCV-BOOM(2)
+        
+      </h3>
+    </div>
+    
+  </nav>
+
+
+  
+</article>
+
+
+
+
+
+
+</section>
+          
+        </div>
+        <footer id="footer" class="wow fadeInUp">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      <div>
+        <span class="icon-copyright"></span>
+        2020-2025
+        <span class="footer-info-sep"></span>
+        Sora
+      </div>
+      
+        <div>
+          Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>&nbsp;
+          Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" target="_blank">Reimu</a>
+        </div>
+      
+      
+        <div>
+          <span class="icon-brush"></span>
+          9.2k
+          &nbsp;|&nbsp;
+          <span class="icon-coffee"></span>
+          00:43
+        </div>
+      
+      
+        <div>
+          <span class="icon-eye"></span>
+          <span id="busuanzi_container_site_pv">Number of visits&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+          &nbsp;|&nbsp;
+          <span class="icon-user"></span>
+          <span id="busuanzi_container_site_uv">Number of visitors&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+        </div>
+      
+    </div>
+  </div>
+</footer>
+
+        <div class="sidebar-top">
+          <img src="/images/sora_icon.png" height="50" width="50" />
+          <div class="arrow-up"></div>
+        </div>
+        <div id="mask"></div>
+      </div>
+      <nav id="mobile-nav">
+  <div class="sidebar-wrap">
+    
+      <div class="sidebar-toc-sidebar"><div class="sidebar-toc">
+  <h3 class="toc-title">Contents</h3>
+  <div class="sidebar-toc-wrapper"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#riscv-boom-icache"><span class="toc-number">1.</span> <span class="toc-text"> RISCV-BOOM ICACHE</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90"><span class="toc-number">1.1.</span> <span class="toc-text"> 代码分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#icache"><span class="toc-number">1.1.1.</span> <span class="toc-text"> ICache</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#icacheresp"><span class="toc-number">1.1.2.</span> <span class="toc-text"> ICacheResp</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#icache-bundle"><span class="toc-number">1.1.3.</span> <span class="toc-text"> ICache Bundle</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#icachemodule"><span class="toc-number">1.1.4.</span> <span class="toc-text"> ICacheModule</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#sub-banking-and-interleaving"><span class="toc-number">1.2.</span> <span class="toc-text"> Sub-Banking and interleaving</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">1.3.</span> <span class="toc-text"> 总结</span></a></li></ol></li></ol></div>
+</div>
+</div>
+      <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/sora.jpg" data-sizes="auto" alt="Sora" class="lazyload">
+  <div class="sidebar-author-name">Sora</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>Posts</div>
+    <div class="sidebar-state-number">6</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>Categories</div>
+    <div class="sidebar-state-number">5</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>Tags</div>
+    <div class="sidebar-state-number">4</div>
+  </div>
+</div>
+<div class="sidebar-social">
+  
+</div>
+<div class="sidebar-menu">
+  
+    <div class="sidebar-menu-link-wrap">
+      <a class="sidebar-menu-link-dummy" href="/" aria-label="Home"></a>
+      <span class="sidebar-menu-icon"></span>
+      <div class="sidebar-menu-link">Home</div>
+    </div>
+  
+    <div class="sidebar-menu-link-wrap">
+      <a class="sidebar-menu-link-dummy" href="/archives" aria-label="Archives"></a>
+      <span class="sidebar-menu-icon"></span>
+      <div class="sidebar-menu-link">Archives</div>
+    </div>
+  
+    <div class="sidebar-menu-link-wrap">
+      <a class="sidebar-menu-link-dummy" href="/about" aria-label="About"></a>
+      <span class="sidebar-menu-icon"></span>
+      <div class="sidebar-menu-link">About</div>
+    </div>
+  
+    <div class="sidebar-menu-link-wrap">
+      <a class="sidebar-menu-link-dummy" href="/friend" aria-label="Friend"></a>
+      <span class="sidebar-menu-icon"></span>
+      <div class="sidebar-menu-link">Friend</div>
+    </div>
+  
+</div>
+</div>
+    
+  </div>
+  
+    <div class="sidebar-btn-wrapper">
+      <div class="sidebar-toc-btn current"></div>
+      <div class="sidebar-common-btn"></div>
+    </div>
+  
+</nav>
+
+    </div>
+    <div class="site-search">
+      <div class="reimu-popup popup">
+        <div class="reimu-search">
+          <span class="reimu-search-input-icon"></span>
+          <div class="reimu-search-input" id="reimu-search-input"></div>
+        </div>
+        <div class="reimu-results">
+          <div id="reimu-stats"></div>
+          <div id="reimu-hits"></div>
+          <div id="reimu-pagination" class="reimu-pagination"></div>
+        </div>
+        <span class="popup-btn-close"></span>
+      </div>
+    </div>
+    
+<script src="https://npm.webcache.cn/jquery@3.7.1/dist/jquery.min.js"></script>
+
+
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js"></script>
+
+
+
+  
+<script src="https://npm.webcache.cn/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" defer></script>
+
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" async></script>
+
+
+
+
+  
+<script src="https://npm.webcache.cn/mermaid@9.4.3/dist/mermaid.min.js"></script>
+
+  <script>
+    if (window.mermaid) {
+      // https://github.com/mermaid-js/mermaid/issues/1945
+      const elementCode = '.mermaid'
+      const saveOriginalData = () => {
+        return new Promise((resolve, reject) => {
+          try {
+            var els = document.querySelectorAll(elementCode),
+                count = els.length;
+            els.forEach(element => {
+              if (element.getAttribute('data-original-code') == null){
+                element.setAttribute('data-original-code', element.innerHTML)
+              }
+              count--
+              if(count == 0){
+                resolve()
+              }
+            });
+          } catch (error) {
+          reject(error) 
+          }
+        })
+      }
+      const resetProcessed = () => {
+        return new Promise((resolve, reject) => {
+          try {
+            var els = document.querySelectorAll(elementCode),
+                count = els.length;
+            els.forEach(element => {
+              if(element.getAttribute('data-original-code') != null){
+                element.removeAttribute('data-processed')
+                element.innerHTML = element.getAttribute('data-original-code')
+              }
+              count--
+              if(count == 0){
+                resolve()
+              }
+            });
+          } catch (error) {
+          reject(error) 
+          }
+        })
+      } 
+      const loadMermaid = (theme) => {
+        window.mermaid.initialize({theme})
+        window.mermaid.init({theme}, document.querySelectorAll(elementCode))
+      }
+      document.body.addEventListener('dark-theme-set', () => {
+        saveOriginalData()
+        .then(resetProcessed())
+        .then(loadMermaid('dark'))
+        .catch(console.error)
+      })
+      document.body.addEventListener('light-theme-set', () => {
+        saveOriginalData()
+        .then(resetProcessed())
+        .then(loadMermaid('default'))
+        .catch(console.error)
+      })
+    }
+  </script>
+
+
+
+<script src="/js/pjax_script.js" data-pjax></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+<script src="/js/generator_search.js"></script>
+
+  
+<script src="https://npm.webcache.cn/instantsearch.js@4.56.1/dist/instantsearch.production.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '0.1.0' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+  <!-- hexo injector body_end start -->
+<script src="/js/insert_highlight.js" data-pjax></script>
+<!-- hexo injector body_end end --></body>
+  </html>
+

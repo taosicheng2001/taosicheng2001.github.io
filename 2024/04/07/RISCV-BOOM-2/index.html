@@ -1,0 +1,706 @@
+
+  <!DOCTYPE html>
+  <html lang="en"  data-theme="dark" >
+  <head>
+  <meta charset="utf-8">
+  
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script src="https://www.googletagmanager.com/gtag/js?id=G-W2D8Z0W2X1"></script>
+  <script data-pjax>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'G-W2D8Z0W2X1');
+  </script>
+  <!-- End Google Analytics -->
+
+
+  
+
+  
+
+  
+  <title>
+    RISCV-BOOM(2) |
+    
+    ソラの小屋
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="preload" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic%7CNoto%20Serif%20SC:400,400italic,700,700italic%7CUbuntu%20Mono:400,400italic,700,700italic&display=swap&subset=latin,latin-ext" as="style" onload="this.onload&#x3D;null;this.rel&#x3D;&#39;stylesheet&#39;">
+  
+<link rel="stylesheet" href="https://npm.webcache.cn/@fortawesome/fontawesome-free@6.5.1/css/regular.min.css">
+<link rel="stylesheet" href="https://npm.webcache.cn/@fortawesome/fontawesome-free@6.5.1/css/solid.min.css">
+
+  <link rel="preload" href="https://npm.webcache.cn/@fortawesome/fontawesome-free@6.5.1/css/brands.min.css" as="style" onload="this.onload&#x3D;null;this.rel&#x3D;&#39;stylesheet&#39;"><link rel="preload" href="https://npm.webcache.cn/@fortawesome/fontawesome-free@6.5.1/css/v5-font-face.min.css" as="style" onload="this.onload&#x3D;null;this.rel&#x3D;&#39;stylesheet&#39;"><link rel="preload" href="https://npm.webcache.cn/@fortawesome/fontawesome-free@6.5.1/css/v4-font-face.min.css" as="style" onload="this.onload&#x3D;null;this.rel&#x3D;&#39;stylesheet&#39;">
+  
+<link rel="stylesheet" href="/css/loader.css">
+
+  <meta name="description" content="RISCV-BOOM Front-End  整体代码位于src&#x2F;main&#x2F;scala&#x2F;ifu，其中frontend.scale为最顶层，icache.scala实现指令缓存，fetch-buffer.scala实现取指缓冲区，fetch-target-queue.scala干啥呢？,bpd目录下的文件实现分支预测  代码阅读 首先从最顶层入手，在BoomFrontend类中实例化了前端的所有部件">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RISCV-BOOM(2)">
+<meta property="og:url" content="https://taosicheng2001.github.io/2024/04/07/RISCV-BOOM-2/index.html">
+<meta property="og:site_name" content="ソラの小屋">
+<meta property="og:description" content="RISCV-BOOM Front-End  整体代码位于src&#x2F;main&#x2F;scala&#x2F;ifu，其中frontend.scale为最顶层，icache.scala实现指令缓存，fetch-buffer.scala实现取指缓冲区，fetch-target-queue.scala干啥呢？,bpd目录下的文件实现分支预测  代码阅读 首先从最顶层入手，在BoomFrontend类中实例化了前端的所有部件">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://taosicheng2001.github.io/images/front-end.svg">
+<meta property="og:image" content="https://taosicheng2001.github.io/images/F3_bank_insts.jpg">
+<meta property="article:published_time" content="2024-04-07T05:46:00.000Z">
+<meta property="article:modified_time" content="2024-05-05T15:00:58.487Z">
+<meta property="article:author" content="Sora">
+<meta property="article:tag" content="Code Reading">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://taosicheng2001.github.io/images/front-end.svg">
+  
+    <link rel="alternate" href="/atom.xml" title="ソラの小屋" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/images/sora_icon.ico">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
+
+  
+  
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/katex@0.16.9/dist/katex.min.css">
+
+  
+  
+  
+  
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js"></script>
+
+  
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/wowjs@1.1.3/css/libs/animate.css">
+
+    
+<script src="https://npm.webcache.cn/wowjs@1.1.3/dist/wow.min.js"></script>
+
+    <script>
+      new WOW({
+        offset: 0,
+        mobile: true,
+        live: false
+      }).init();
+    </script>
+  
+  
+    <script src="/sw.js"></script>
+  
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+  <body>
+    
+  <div id='loader'>
+    <div class="loading-left-bg"></div>
+    <div class="loading-right-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi">
+        <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+          <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="#ff6e6b" />
+          <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z" fill="#fd0d00" />
+          <path d="M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95" fill="#fd0d00" />
+        </svg>
+      </div>
+      <div class="loading-word">Loading...</div>
+    </div>
+  </div>
+  </div>
+  <script>
+    var time = null;
+    const startLoading = () => {
+      time = Date.now();
+      document.getElementById('loader').classList.remove("loading");
+    }
+    const endLoading = () => {
+      if (!time) {
+        document.body.style.overflow = 'auto';
+        document.getElementById('loader').classList.add("loading");
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          document.body.style.overflow = 'auto';
+          document.getElementById('loader').classList.add("loading");
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('load', endLoading);
+    document.getElementById('loader').addEventListener('click', endLoading);
+  </script>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav">
+    
+      <span class="main-nav-link-wrap">
+        <span class="main-nav-icon"></span>
+        <a class="main-nav-link" href="/">Home</a>
+      </span>
+    
+      <span class="main-nav-link-wrap">
+        <span class="main-nav-icon"></span>
+        <a class="main-nav-link" href="/archives">Archives</a>
+      </span>
+    
+      <span class="main-nav-link-wrap">
+        <span class="main-nav-icon"></span>
+        <a class="main-nav-link" href="/about">About</a>
+      </span>
+    
+      <span class="main-nav-link-wrap">
+        <span class="main-nav-icon"></span>
+        <a class="main-nav-link" href="/friend">Friend</a>
+      </span>
+    
+    <a id="main-nav-toggle" class="nav-icon"></a>
+  </nav>
+  <nav id="sub-nav">
+    
+      <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+    
+    
+    
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="Search"></a>
+    
+  </nav>
+</div>
+<header id="header">
+  
+    <img fetchpriority="high" src="/images/Night.jpg" alt="RISCV-BOOM(2)">
+  
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <div id="logo-wrap">
+        
+          
+          
+            <a href="/" id="logo">
+              <h1>RISCV-BOOM(2)</h1>
+            </a>
+          
+        
+      </div>
+      
+        
+        <h2 id="subtitle-wrap">
+          
+        </h2>
+      
+    </div>
+  </div>
+</header>
+
+        <div id="content" class="outer">
+          
+            <aside id="sidebar">
+  <div class="sidebar-wrap wow fadeInRight wrap-sticky">
+    
+      <div class="sidebar-toc-sidebar"><div class="sidebar-toc">
+  <h3 class="toc-title">Contents</h3>
+  <div class="sidebar-toc-wrapper"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#riscv-boom-front-end"><span class="toc-number">1.</span> <span class="toc-text"> RISCV-BOOM Front-End</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB"><span class="toc-number">1.1.</span> <span class="toc-text"> 代码阅读</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#boomfrontendmodule"><span class="toc-number">1.1.1.</span> <span class="toc-text"> BoomFrontendModule</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#io%E8%BF%9E%E7%BA%BF"><span class="toc-number">1.1.1.1.</span> <span class="toc-text"> IO连线</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#f0-nextpc-select"><span class="toc-number">1.1.1.2.</span> <span class="toc-text"> F0 (NextPC Select)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#f1-icache-access"><span class="toc-number">1.1.1.3.</span> <span class="toc-text"> F1 (ICache Access)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#f2-icache-response"><span class="toc-number">1.1.1.4.</span> <span class="toc-text"> F2 (ICache Response)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#f3"><span class="toc-number">1.1.1.5.</span> <span class="toc-text"> F3</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#f4-f5"><span class="toc-number">1.1.1.6.</span> <span class="toc-text"> F4 &amp; F5</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E4%BF%A1%E5%8F%B7%E8%B7%9F%E8%B8%AA"><span class="toc-number">1.1.1.7.</span> <span class="toc-text"> 关键信号跟踪</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#sx_valid"><span class="toc-number">1.1.1.7.1.</span> <span class="toc-text"> sx_valid</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#sx_is_replay"><span class="toc-number">1.1.1.7.2.</span> <span class="toc-text"> sx_is_replay</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#fx_clear"><span class="toc-number">1.1.1.7.3.</span> <span class="toc-text"> fx_clear</span></a></li></ol></li></ol></li></ol></li></ol></li></ol></div>
+</div>
+</div>
+      <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/sora.jpg" data-sizes="auto" alt="Sora" class="lazyload">
+  <div class="sidebar-author-name">Sora</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>Posts</div>
+    <div class="sidebar-state-number">6</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>Categories</div>
+    <div class="sidebar-state-number">5</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>Tags</div>
+    <div class="sidebar-state-number">4</div>
+  </div>
+</div>
+<div class="sidebar-social">
+  
+</div>
+<div class="sidebar-menu">
+  
+    <div class="sidebar-menu-link-wrap">
+      <a class="sidebar-menu-link-dummy" href="/" aria-label="Home"></a>
+      <span class="sidebar-menu-icon"></span>
+      <div class="sidebar-menu-link">Home</div>
+    </div>
+  
+    <div class="sidebar-menu-link-wrap">
+      <a class="sidebar-menu-link-dummy" href="/archives" aria-label="Archives"></a>
+      <span class="sidebar-menu-icon"></span>
+      <div class="sidebar-menu-link">Archives</div>
+    </div>
+  
+    <div class="sidebar-menu-link-wrap">
+      <a class="sidebar-menu-link-dummy" href="/about" aria-label="About"></a>
+      <span class="sidebar-menu-icon"></span>
+      <div class="sidebar-menu-link">About</div>
+    </div>
+  
+    <div class="sidebar-menu-link-wrap">
+      <a class="sidebar-menu-link-dummy" href="/friend" aria-label="Friend"></a>
+      <span class="sidebar-menu-icon"></span>
+      <div class="sidebar-menu-link">Friend</div>
+    </div>
+  
+</div>
+</div>
+    
+    
+      <div class="sidebar-btn-wrapper" style="position:static">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+    
+  </div>
+
+  
+</aside>
+
+          
+          <section id="main"><article id="post-RISCV-BOOM-2" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner">
+    <div class="article-meta">
+      <div class="article-date wow slideInLeft">
+  <a href="/2024/04/07/RISCV-BOOM-2/" class="article-date-link">
+    <time datetime="2024-04-07T05:46:00.000Z" itemprop="datePublished">2024-04-07</time>
+  </a>
+</div>
+
+      
+  <div class="article-category wow slideInLeft">
+    <a class="article-category-link" href="/categories/Computer-Architecture/">Computer Architecture</a><a class="article-category-link" href="/categories/Computer-Architecture/RISCV-BOOM/">RISCV-BOOM</a>
+  </div>
+
+
+    </div>
+    <div class="hr-line"></div>
+    
+
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="riscv-boom-front-end"><a class="markdownIt-Anchor" href="#riscv-boom-front-end"></a> RISCV-BOOM Front-End</h1>
+<p><img src="/images/front-end.svg" alt="BOOM Front-End" /><br />
+整体代码位于<code>src/main/scala/ifu</code>，其中<code>frontend.scale</code>为最顶层，<code>icache.scala</code>实现指令缓存，<code>fetch-buffer.scala</code>实现取指缓冲区，<code>fetch-target-queue.scala</code>干啥呢？,<code>bpd</code>目录下的文件实现分支预测</p>
+<h2 id="代码阅读"><a class="markdownIt-Anchor" href="#代码阅读"></a> 代码阅读</h2>
+<p>首先从最顶层入手，在<code>BoomFrontend</code>类中实例化了前端的所有部件，下面进行一层一层的分析</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BoomFrontend</span>(<span class="params">val icacheParams: <span class="type">ICacheParams</span>, staticIdForMetadataUseOnly: <span class="type">Int</span></span>)(<span class="params">implicit p: <span class="type">Parameters</span></span>) <span class="keyword">extends</span> <span class="title">LazyModule</span></span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">lazy</span> <span class="keyword">val</span> module = <span class="keyword">new</span> <span class="type">BoomFrontendModule</span>(<span class="keyword">this</span>) <span class="comment">// 实例化Module，传入当前BoomFrontend实例作为参数</span></span><br><span class="line">  <span class="keyword">val</span> icache = <span class="type">LazyModule</span>(<span class="keyword">new</span> boom.ifu.<span class="type">ICache</span>(icacheParams, staticIdForMetadataUseOnly)) <span class="comment">// 实例化Icache</span></span><br><span class="line">  <span class="keyword">val</span> masterNode = icache.masterNode <span class="comment">// 实例化 Icache的MasterNode</span></span><br><span class="line">  <span class="keyword">val</span> resetVectorSinkNode = <span class="type">BundleBridgeSink</span>[<span class="type">UInt</span>](<span class="type">Some</span>(() =&gt;</span><br><span class="line">    <span class="type">UInt</span>(masterNode.edges.out.head.bundle.addressBits.<span class="type">W</span>))) <span class="comment">// 实例化resetVectorSinkNode</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="boomfrontendmodule"><a class="markdownIt-Anchor" href="#boomfrontendmodule"></a> <code>BoomFrontendModule</code></h3>
+<p><code>module</code>通过<code>BoomFrontendModule</code>接口进行实例化，该模块处理了IO连线和前端的五段流水，我们一步步进行分析</p>
+<h4 id="io连线"><a class="markdownIt-Anchor" href="#io连线"></a> IO连线</h4>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> io = <span class="type">IO</span>(<span class="keyword">new</span> <span class="type">BoomFrontendBundle</span>(outer))</span><br><span class="line"><span class="keyword">val</span> io_reset_vector = outer.resetVectorSinkNode.bundle</span><br><span class="line"><span class="keyword">implicit</span> <span class="keyword">val</span> edge = outer.masterNode.edges.out(<span class="number">0</span>)</span><br><span class="line">require(fetchWidth*coreInstBytes == outer.icacheParams.fetchBytes)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> bpd = <span class="type">Module</span>(<span class="keyword">new</span> <span class="type">BranchPredictor</span>)</span><br><span class="line">bpd.io.f3_fire := <span class="literal">false</span>.<span class="type">B</span></span><br><span class="line"><span class="keyword">val</span> ras = <span class="type">Module</span>(<span class="keyword">new</span> <span class="type">BoomRAS</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> icache = outer.icache.module</span><br><span class="line">icache.io.invalidate := io.cpu.flush_icache</span><br><span class="line"><span class="keyword">val</span> tlb = <span class="type">Module</span>(<span class="keyword">new</span> <span class="type">TLB</span>(<span class="literal">true</span>, log2Ceil(fetchBytes), <span class="type">TLBConfig</span>(nTLBSets, nTLBWays)))</span><br><span class="line">io.ptw &lt;&gt; tlb.io.ptw</span><br><span class="line">io.cpu.perf.tlbMiss := io.ptw.req.fire</span><br><span class="line">io.cpu.perf.acquire := icache.io.perf.acquire</span><br></pre></td></tr></table></figure>
+<p>首先实例化的是<code>BoomFrontendBundle</code>这一IO变量，这个IO包含<code>BoomFrontedIO</code>和<code>TLBPTWIO</code>。<code>BoomFrontedIO</code>是前端和CPU之间的通信IO；<code>TLBPTWIO</code>是TLB和PTW之间的通信IO，涉及CPU虚拟地址向物理地址转化的过程。<code>BranchPredictor()</code>和<code>BoomRAS()</code>分别实例化分支预测器和返回值栈，<code>icache</code>在前面已经实例化过，这里直接引用，<code>TLB()</code>实例化快表。</p>
+<h4 id="f0-nextpc-select"><a class="markdownIt-Anchor" href="#f0-nextpc-select"></a> F0 (NextPC Select)</h4>
+<p>前端流水的第一个阶段，主要任务是向ICache发起取指请求。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Stage0 初始化所有信号，基本都设置为0</span></span><br><span class="line"><span class="keyword">val</span> s0_vpc       = <span class="type">WireInit</span>(<span class="number">0.</span><span class="type">U</span>(vaddrBitsExtended.<span class="type">W</span>))  <span class="comment">// Virtual Program Counter</span></span><br><span class="line"><span class="keyword">val</span> s0_ghist     = <span class="type">WireInit</span>((<span class="number">0.</span><span class="type">U</span>).asTypeOf(<span class="keyword">new</span> <span class="type">GlobalHistory</span>)) <span class="comment">// Global History </span></span><br><span class="line"><span class="keyword">val</span> s0_tsrc      = <span class="type">WireInit</span>(<span class="number">0.</span><span class="type">U</span>(<span class="type">BSRC_SZ</span>.<span class="type">W</span>)) <span class="comment">// &quot;tsrc provides the prediction TO this packet&quot; </span></span><br><span class="line"><span class="keyword">val</span> s0_valid     = <span class="type">WireInit</span>(<span class="literal">false</span>.<span class="type">B</span>) <span class="comment">// 合法标志位 默认为false</span></span><br><span class="line"><span class="keyword">val</span> s0_is_replay = <span class="type">WireInit</span>(<span class="literal">false</span>.<span class="type">B</span>) <span class="comment">// 重播标志位 默认为false</span></span><br><span class="line"><span class="keyword">val</span> s0_is_sfence = <span class="type">WireInit</span>(<span class="literal">false</span>.<span class="type">B</span>) <span class="comment">// sfence标志位 默认为false</span></span><br><span class="line"><span class="keyword">val</span> s0_replay_resp = <span class="type">Wire</span>(<span class="keyword">new</span> <span class="type">TLBResp</span>) </span><br><span class="line"><span class="keyword">val</span> s0_replay_bpd_resp = <span class="type">Wire</span>(<span class="keyword">new</span> <span class="type">BranchPredictionBundle</span>)</span><br><span class="line"><span class="keyword">val</span> s0_replay_ppc  = <span class="type">Wire</span>(<span class="type">UInt</span>())</span><br><span class="line"><span class="keyword">val</span> s0_s1_use_f3_bpd_resp = <span class="type">WireInit</span>(<span class="literal">false</span>.<span class="type">B</span>)</span><br><span class="line"></span><br><span class="line">when (<span class="type">RegNext</span>(reset.asBool) &amp;&amp; !reset.asBool) &#123; </span><br><span class="line">  <span class="comment">// 声明一个寄存器，将reset作为寄存器的输入信号，reset应当是一个全局的复位信号</span></span><br><span class="line">  <span class="comment">// 当reset信号上一个周期为真且当前周期为假时执行该代码段</span></span><br><span class="line">  </span><br><span class="line">  s0_valid   := <span class="literal">true</span>.<span class="type">B</span></span><br><span class="line">  s0_vpc     := io_reset_vector <span class="comment">// 把vpc复位到特定值</span></span><br><span class="line">  s0_ghist   := (<span class="number">0.</span><span class="type">U</span>).asTypeOf(<span class="keyword">new</span> <span class="type">GlobalHistory</span>)</span><br><span class="line">  s0_tsrc    := <span class="type">BSRC_C</span> <span class="comment">// 设置为 core branch resolution 状态</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 向icache传入当前有效标志位和vpc</span></span><br><span class="line">icache.io.req.valid     := s0_valid</span><br><span class="line">icache.io.req.bits.addr := s0_vpc</span><br><span class="line"></span><br><span class="line"><span class="comment">// 向bpd传入当前有效标志位，vpc和全局历史记录</span></span><br><span class="line">bpd.io.f0_req.valid      := s0_valid</span><br><span class="line">bpd.io.f0_req.bits.pc    := s0_vpc</span><br><span class="line">bpd.io.f0_req.bits.ghist := s0_ghist</span><br></pre></td></tr></table></figure>
+<h4 id="f1-icache-access"><a class="markdownIt-Anchor" href="#f1-icache-access"></a> F1 (ICache Access)</h4>
+<p>前端流水的第二个阶段，主要任务是(1)利用vpc访问TLB,获取ppc (2)利用ppc访问ICache (3)利用bpd Resp计算出是否重定向以及下一个取指的vpc (4)更新流水段的时序逻辑信号</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 把上一阶段的寄存器值传递到这一阶段的寄存器中</span></span><br><span class="line"><span class="keyword">val</span> s1_vpc       = <span class="type">RegNext</span>(s0_vpc)</span><br><span class="line"><span class="keyword">val</span> s1_valid     = <span class="type">RegNext</span>(s0_valid, <span class="literal">false</span>.<span class="type">B</span>) <span class="comment">// 默认初始值为false</span></span><br><span class="line"><span class="keyword">val</span> s1_ghist     = <span class="type">RegNext</span>(s0_ghist)</span><br><span class="line"><span class="keyword">val</span> s1_is_replay = <span class="type">RegNext</span>(s0_is_replay)</span><br><span class="line"><span class="keyword">val</span> s1_is_sfence = <span class="type">RegNext</span>(s0_is_sfence)</span><br><span class="line"><span class="keyword">val</span> f1_clear     = <span class="type">WireInit</span>(<span class="literal">false</span>.<span class="type">B</span>) </span><br><span class="line"><span class="keyword">val</span> s1_tsrc      = <span class="type">RegNext</span>(s0_tsrc)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 访问tlb</span></span><br><span class="line">tlb.io.req.valid      := (s1_valid &amp;&amp; !s1_is_replay &amp;&amp; !f1_clear) || s1_is_sfence <span class="comment">// 生成tlb有效标志位</span></span><br><span class="line">tlb.io.req.bits.cmd   := <span class="type">DontCare</span></span><br><span class="line">tlb.io.req.bits.vaddr := s1_vpc      <span class="comment">// 把s1_vpc传给tlb</span></span><br><span class="line">tlb.io.req.bits.passthrough := <span class="literal">false</span>.<span class="type">B</span> <span class="comment">// 默认不passthrough</span></span><br><span class="line">tlb.io.req.bits.size  := log2Ceil(coreInstBytes * fetchWidth).<span class="type">U</span></span><br><span class="line">tlb.io.req.bits.v     := io.ptw.status.v</span><br><span class="line">tlb.io.req.bits.prv   := io.ptw.status.prv</span><br><span class="line">tlb.io.sfence         := <span class="type">RegNext</span>(io.cpu.sfence)</span><br><span class="line">tlb.io.kill           := <span class="literal">false</span>.<span class="type">B</span> <span class="comment">// 默认不kill</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// tlb resp</span></span><br><span class="line"><span class="keyword">val</span> s1_tlb_miss = !s1_is_replay &amp;&amp; tlb.io.resp.miss</span><br><span class="line"><span class="keyword">val</span> s1_tlb_resp = <span class="type">Mux</span>(s1_is_replay, <span class="type">RegNext</span>(s0_replay_resp), tlb.io.resp) <span class="comment">// 如果s1需要重播,使用s0阶段的重播resp，否则使用tlb的resp</span></span><br><span class="line"><span class="keyword">val</span> s1_ppc  = <span class="type">Mux</span>(s1_is_replay, <span class="type">RegNext</span>(s0_replay_ppc), tlb.io.resp.paddr) <span class="comment">// 如果s1需要重播,使用s0阶段的重播ppc，否则使用tlb的paddr</span></span><br><span class="line"><span class="comment">// bpd resp</span></span><br><span class="line"><span class="keyword">val</span> s1_bpd_resp = bpd.io.resp.f1 <span class="comment">// 获取bpd的resp,后续使用resp进行重定向判断</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 向icache传入tlb翻译后的physical pc和kill标志位</span></span><br><span class="line">icache.io.s1_paddr := s1_ppc</span><br><span class="line">icache.io.s1_kill  := tlb.io.resp.miss || f1_clear <span class="comment">// 当f1_clear或tlb返回miss时kill</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> f1_mask = fetchMask(s1_vpc) <span class="comment">// 若fetchWidth为1,则mask为全1</span></span><br><span class="line"><span class="keyword">val</span> f1_redirects = (<span class="number">0</span> until fetchWidth) map &#123; i =&gt;</span><br><span class="line">  s1_valid &amp;&amp; f1_mask(i) &amp;&amp; s1_bpd_resp.preds(i).predicted_pc.valid &amp;&amp;</span><br><span class="line">  (s1_bpd_resp.preds(i).is_jal ||</span><br><span class="line">    (s1_bpd_resp.preds(i).is_br &amp;&amp; s1_bpd_resp.preds(i).taken))</span><br><span class="line">&#125; <span class="comment">// 生成一个重定向标志位列表，对每个取指的指令检查 取掩码后是否合法，分支预测的PC是否合法，分支预测的指令是否是无条件跳转或Taken的有条件跳转</span></span><br><span class="line"><span class="keyword">val</span> f1_redirect_idx = <span class="type">PriorityEncoder</span>(f1_redirects) <span class="comment">// 选择出重定向标志位列表中最先的1,这个idx指向最早的一个分支重定向指令</span></span><br><span class="line"><span class="keyword">val</span> f1_do_redirect = f1_redirects.reduce(_||_) &amp;&amp; useBPD.<span class="type">B</span> <span class="comment">// 归约重定向标志位列表，判断是否需要重定向</span></span><br><span class="line"><span class="keyword">val</span> f1_targs = s1_bpd_resp.preds.map(_.predicted_pc.bits) <span class="comment">// 将predicted_pc成员的bits取出来组成target列表</span></span><br><span class="line"><span class="keyword">val</span> f1_predicted_target = <span class="type">Mux</span>(f1_do_redirect,</span><br><span class="line">                              f1_targs(f1_redirect_idx),</span><br><span class="line">                              nextFetch(s1_vpc))  <span class="comment">// 生成下一个取指目标，跳转or顺序</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 更新GlobalHistory 方法参数分别为 branches, cfi_taken, cfi_is_br, cfi_idx, cfi_valid, addr, cfi_is_call, cfi_is_ret </span></span><br><span class="line"><span class="keyword">val</span> f1_predicted_ghist = s1_ghist.update(</span><br><span class="line">  s1_bpd_resp.preds.map(p =&gt; p.is_br &amp;&amp; p.predicted_pc.valid).asUInt &amp; f1_mask,  <span class="comment">//branches 生成分支标志位列表</span></span><br><span class="line">  s1_bpd_resp.preds(f1_redirect_idx).taken &amp;&amp; f1_do_redirect,    <span class="comment">// cfi_taken</span></span><br><span class="line">  s1_bpd_resp.preds(f1_redirect_idx).is_br,  <span class="comment">// cfi_is_br</span></span><br><span class="line">  f1_redirect_idx, <span class="comment">// cfi_idx</span></span><br><span class="line">  f1_do_redirect, <span class="comment">// cfi_valid</span></span><br><span class="line">  s1_vpc, <span class="comment">// addr</span></span><br><span class="line">  <span class="literal">false</span>.<span class="type">B</span>, <span class="comment">// cfi_is_call</span></span><br><span class="line">  <span class="literal">false</span>.<span class="type">B</span>) <span class="comment">// cfi_is_ret</span></span><br><span class="line"></span><br><span class="line">when (s1_valid &amp;&amp; !s1_tlb_miss) &#123; <span class="comment">// 设置s0信号，配合RegNext函数，这些值将在下一个时钟周期有效</span></span><br><span class="line">  <span class="comment">// Stop fetching on fault</span></span><br><span class="line">  s0_valid     := !(s1_tlb_resp.ae.inst || s1_tlb_resp.pf.inst)</span><br><span class="line">  s0_tsrc      := <span class="type">BSRC_1</span></span><br><span class="line">  s0_vpc       := f1_predicted_target <span class="comment">// 使用分支预测的结果</span></span><br><span class="line">  s0_ghist     := f1_predicted_ghist  <span class="comment">// 更新分支预测全局历史</span></span><br><span class="line">  s0_is_replay := <span class="literal">false</span>.<span class="type">B</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="f2-icache-response"><a class="markdownIt-Anchor" href="#f2-icache-response"></a> F2 (ICache Response)</h4>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> s2_valid = <span class="type">RegNext</span>(s1_valid &amp;&amp; !f1_clear, <span class="literal">false</span>.<span class="type">B</span>) <span class="comment">// 默认非Valid，等待置起为有效</span></span><br><span class="line"><span class="keyword">val</span> s2_vpc   = <span class="type">RegNext</span>(s1_vpc)</span><br><span class="line"><span class="keyword">val</span> s2_ghist = <span class="type">Reg</span>(<span class="keyword">new</span> <span class="type">GlobalHistory</span>)</span><br><span class="line">s2_ghist := s1_ghist</span><br><span class="line"><span class="keyword">val</span> s2_ppc  = <span class="type">RegNext</span>(s1_ppc)</span><br><span class="line"><span class="keyword">val</span> s2_tsrc = <span class="type">RegNext</span>(s1_tsrc) <span class="comment">// tsrc provides the predictor component which provided the prediction TO this instruction</span></span><br><span class="line"><span class="keyword">val</span> s2_fsrc = <span class="type">WireInit</span>(<span class="type">BSRC_1</span>) <span class="comment">// fsrc provides the predictor component which provided the prediction FROM this instruction</span></span><br><span class="line"><span class="keyword">val</span> f2_clear = <span class="type">WireInit</span>(<span class="literal">false</span>.<span class="type">B</span>)</span><br><span class="line"><span class="keyword">val</span> s2_tlb_resp = <span class="type">RegNext</span>(s1_tlb_resp)</span><br><span class="line"><span class="keyword">val</span> s2_tlb_miss = <span class="type">RegNext</span>(s1_tlb_miss)</span><br><span class="line"><span class="keyword">val</span> s2_is_replay = <span class="type">RegNext</span>(s1_is_replay) &amp;&amp; s2_valid</span><br><span class="line"><span class="keyword">val</span> s2_xcpt = s2_valid &amp;&amp; (s2_tlb_resp.ae.inst || s2_tlb_resp.pf.inst) &amp;&amp; !s2_is_replay</span><br><span class="line"><span class="keyword">val</span> f3_ready = <span class="type">Wire</span>(<span class="type">Bool</span>())</span><br><span class="line"></span><br><span class="line">icache.io.s2_kill := s2_xcpt</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> f2_bpd_resp = bpd.io.resp.f2 <span class="comment">// 这里还能拿回resp的f2?那看来是bpd那边会有一个FIFO？</span></span><br><span class="line"><span class="keyword">val</span> f2_mask = fetchMask(s2_vpc)</span><br><span class="line"><span class="keyword">val</span> f2_redirects = (<span class="number">0</span> until fetchWidth) map &#123; i =&gt;</span><br><span class="line">  s2_valid &amp;&amp; f2_mask(i) &amp;&amp; f2_bpd_resp.preds(i).predicted_pc.valid &amp;&amp;</span><br><span class="line">  (f2_bpd_resp.preds(i).is_jal ||</span><br><span class="line">    (f2_bpd_resp.preds(i).is_br &amp;&amp; f2_bpd_resp.preds(i).taken))</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">val</span> f2_redirect_idx = <span class="type">PriorityEncoder</span>(f2_redirects)</span><br><span class="line"><span class="keyword">val</span> f2_targs = f2_bpd_resp.preds.map(_.predicted_pc.bits)</span><br><span class="line"><span class="keyword">val</span> f2_do_redirect = f2_redirects.reduce(_||_) &amp;&amp; useBPD.<span class="type">B</span></span><br><span class="line"><span class="keyword">val</span> f2_predicted_target = <span class="type">Mux</span>(f2_do_redirect,</span><br><span class="line">                              f2_targs(f2_redirect_idx),</span><br><span class="line">                              nextFetch(s2_vpc))</span><br><span class="line"><span class="keyword">val</span> f2_predicted_ghist = s2_ghist.update(</span><br><span class="line">  f2_bpd_resp.preds.map(p =&gt; p.is_br &amp;&amp; p.predicted_pc.valid).asUInt &amp; f2_mask,</span><br><span class="line">  f2_bpd_resp.preds(f2_redirect_idx).taken &amp;&amp; f2_do_redirect,</span><br><span class="line">  f2_bpd_resp.preds(f2_redirect_idx).is_br,</span><br><span class="line">  f2_redirect_idx,</span><br><span class="line">  f2_do_redirect,</span><br><span class="line">  s2_vpc,</span><br><span class="line">  <span class="literal">false</span>.<span class="type">B</span>,</span><br><span class="line">  <span class="literal">false</span>.<span class="type">B</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// f2_predicted_ghist 设置</span></span><br><span class="line"><span class="keyword">val</span> f2_correct_f1_ghist = s1_ghist =/= f2_predicted_ghist &amp;&amp; enableGHistStallRepair.<span class="type">B</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 若s2有效且icache的resp无效 或 s2有效且icache的resp有效且f3未准备好</span></span><br><span class="line">when ((s2_valid &amp;&amp; !icache.io.resp.valid) ||</span><br><span class="line">      (s2_valid &amp;&amp; icache.io.resp.valid &amp;&amp; !f3_ready)) &#123;</span><br><span class="line">  s0_valid := (!s2_tlb_resp.ae.inst &amp;&amp; !s2_tlb_resp.pf.inst) || s2_is_replay || s2_tlb_miss</span><br><span class="line">  s0_vpc   := s2_vpc</span><br><span class="line">  s0_is_replay := s2_valid &amp;&amp; icache.io.resp.valid <span class="comment">// f3未准备好的话，就要让s0_replay?</span></span><br><span class="line">  <span class="comment">// When this is not a replay (it queried the BPDs, we should use f3 resp in the replaying s1)</span></span><br><span class="line">  s0_s1_use_f3_bpd_resp := !s2_is_replay</span><br><span class="line">  s0_ghist := s2_ghist</span><br><span class="line">  s0_tsrc  := s2_tsrc</span><br><span class="line">  f1_clear := <span class="literal">true</span>.<span class="type">B</span>   <span class="comment">// 置位了f1_clear!</span></span><br><span class="line">&#125; .elsewhen (s2_valid &amp;&amp; f3_ready) &#123;</span><br><span class="line">  when (s1_valid &amp;&amp; s1_vpc === f2_predicted_target &amp;&amp; !f2_correct_f1_ghist) &#123;</span><br><span class="line">    <span class="comment">// f2_predicted_target 使用当前指令的vpc(现在是s2_vpc)返回的bpd_resp进行预测，s1_vpc是下一条指令的vpc，在此处判断两者是否相等</span></span><br><span class="line">    <span class="comment">// We trust our prediction of what the global history for the next branch should be</span></span><br><span class="line">    s2_ghist := f2_predicted_ghist</span><br><span class="line">  &#125;</span><br><span class="line">  when ((s1_valid &amp;&amp; (s1_vpc =/= f2_predicted_target || f2_correct_f1_ghist)) || !s1_valid) &#123;</span><br><span class="line">    f1_clear := <span class="literal">true</span>.<span class="type">B</span></span><br><span class="line"></span><br><span class="line">    s0_valid     := !((s2_tlb_resp.ae.inst || s2_tlb_resp.pf.inst) &amp;&amp; !s2_is_replay)</span><br><span class="line">    s0_vpc       := f2_predicted_target</span><br><span class="line">    s0_is_replay := <span class="literal">false</span>.<span class="type">B</span></span><br><span class="line">    s0_ghist     := f2_predicted_ghist</span><br><span class="line">    s2_fsrc      := <span class="type">BSRC_2</span></span><br><span class="line">    s0_tsrc      := <span class="type">BSRC_2</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 把F2阶段的信号转回F1阶段</span></span><br><span class="line">s0_replay_bpd_resp := f2_bpd_resp</span><br><span class="line">s0_replay_resp := s2_tlb_resp</span><br><span class="line">s0_replay_ppc  := s2_ppc</span><br></pre></td></tr></table></figure>
+<h4 id="f3"><a class="markdownIt-Anchor" href="#f3"></a> F3</h4>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br></pre></td><td class="code"><pre><span class="line">  <span class="keyword">val</span> f3_clear = <span class="type">WireInit</span>(<span class="literal">false</span>.<span class="type">B</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">/*  </span></span><br><span class="line"><span class="comment">    Pipe模式下，整个队列以流水线的状态流动,也就是读入和写出可以在同一个周期内先后完成</span></span><br><span class="line"><span class="comment">    if (pipe) &#123;</span></span><br><span class="line"><span class="comment">        when(io.deq.ready) &#123; io.enq.ready := true.B &#125;</span></span><br><span class="line"><span class="comment">    &#125;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">    Flow模式下，输入可以在同一个周期内被输出使用（输出端口直接使用输入）</span></span><br><span class="line"><span class="comment">    if (flow) &#123;</span></span><br><span class="line"><span class="comment">        when(io.enq.valid) &#123; io.deq.valid := true.B &#125;</span></span><br><span class="line"><span class="comment">        when(empty) &#123;</span></span><br><span class="line"><span class="comment">            io.deq.bits := io.enq.bits</span></span><br><span class="line"><span class="comment">            do_deq := false.B</span></span><br><span class="line"><span class="comment">        when(io.deq.ready) &#123; do_enq := false.B &#125;</span></span><br><span class="line"><span class="comment">        &#125;</span></span><br><span class="line"><span class="comment">  &#125;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">  * &quot;decoupled&quot; interface: &#x27;valid&#x27; indicates that the producer has</span></span><br><span class="line"><span class="comment">  * put valid data in &#x27;bits&#x27;, and &#x27;ready&#x27; indicates that the consumer is ready</span></span><br><span class="line"><span class="comment">  * to accept the data this cycle. &#x27;fire&#x27; indicates if IO is both ready and valid</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// IMem Response Queue</span></span><br><span class="line">  <span class="keyword">val</span> f3 = withReset(reset.asBool || f3_clear) &#123;</span><br><span class="line">    <span class="type">Module</span>(<span class="keyword">new</span> <span class="type">Queue</span>(<span class="keyword">new</span> <span class="type">FrontendResp</span>, <span class="number">1</span>, pipe=<span class="literal">true</span>, flow=<span class="literal">false</span>)) &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Queue up the bpd resp as well, incase f4 backpressures f3</span></span><br><span class="line">  <span class="comment">// This is &quot;flow&quot; because the response (enq) arrives in f3, not f2</span></span><br><span class="line">  <span class="keyword">val</span> f3_bpd_resp = withReset(reset.asBool || f3_clear) &#123;</span><br><span class="line">    <span class="type">Module</span>(<span class="keyword">new</span> <span class="type">Queue</span>(<span class="keyword">new</span> <span class="type">BranchPredictionBundle</span>, <span class="number">1</span>, pipe=<span class="literal">true</span>, flow=<span class="literal">true</span>)) &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">val</span> f4_ready = <span class="type">Wire</span>(<span class="type">Bool</span>())</span><br><span class="line">  f3_ready := f3.io.enq.ready <span class="comment">// f3是否ready要看IMem队列入队是否就绪(是否可以接受入队数据)</span></span><br><span class="line">  f3.io.enq.valid   := (s2_valid &amp;&amp; !f2_clear &amp;&amp;</span><br><span class="line">    (icache.io.resp.valid || ((s2_tlb_resp.ae.inst || s2_tlb_resp.pf.inst) &amp;&amp; !s2_tlb_miss))</span><br><span class="line">  ) <span class="comment">// IMem队列入队是否有效,要看F2阶段的操作是否合法(自然把数据放到正确位置了)</span></span><br><span class="line">  </span><br><span class="line">  <span class="comment">//连接s2的数据到IMem队列</span></span><br><span class="line">  f3.io.enq.bits.pc := s2_vpc</span><br><span class="line">  f3.io.enq.bits.data  := <span class="type">Mux</span>(s2_xcpt, <span class="number">0.</span><span class="type">U</span>, icache.io.resp.bits.data)</span><br><span class="line">  f3.io.enq.bits.ghist := s2_ghist</span><br><span class="line">  f3.io.enq.bits.mask := fetchMask(s2_vpc)</span><br><span class="line">  f3.io.enq.bits.xcpt := s2_tlb_resp</span><br><span class="line">  f3.io.enq.bits.fsrc := s2_fsrc</span><br><span class="line">  f3.io.enq.bits.tsrc := s2_tsrc</span><br><span class="line"></span><br><span class="line">  <span class="comment">// RAS takes a cycle to read</span></span><br><span class="line">  <span class="keyword">val</span> ras_read_idx = <span class="type">RegInit</span>(<span class="number">0.</span><span class="type">U</span>(log2Ceil(nRasEntries).<span class="type">W</span>))</span><br><span class="line">  ras.io.read_idx := ras_read_idx</span><br><span class="line">  when (f3.io.enq.fire) &#123;</span><br><span class="line">    ras_read_idx := f3.io.enq.bits.ghist.ras_idx</span><br><span class="line">    ras.io.read_idx := f3.io.enq.bits.ghist.ras_idx</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// The BPD resp comes in f3</span></span><br><span class="line">  f3_bpd_resp.io.enq.valid := f3.io.deq.valid &amp;&amp; <span class="type">RegNext</span>(f3.io.enq.ready) <span class="comment">// 上一拍入队就绪(可接受入队数据)，这一拍出队已合法(数据可以出去)</span></span><br><span class="line">  f3_bpd_resp.io.enq.bits  := bpd.io.resp.f3</span><br><span class="line">  when (f3_bpd_resp.io.enq.fire) &#123;</span><br><span class="line">    bpd.io.f3_fire := <span class="literal">true</span>.<span class="type">B</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// f3两个队列出队要看F4是否就绪 </span></span><br><span class="line">  f3.io.deq.ready := f4_ready</span><br><span class="line">  f3_bpd_resp.io.deq.ready := f4_ready</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  <span class="keyword">val</span> f3_imemresp     = f3.io.deq.bits</span><br><span class="line">  <span class="keyword">val</span> f3_bank_mask    = bankMask(f3_imemresp.pc)</span><br><span class="line">  <span class="keyword">val</span> f3_data         = f3_imemresp.data <span class="comment">// 来自Imemresp的一个64bit的数据</span></span><br><span class="line">  <span class="keyword">val</span> f3_aligned_pc   = bankAlign(f3_imemresp.pc)</span><br><span class="line">  <span class="keyword">val</span> f3_is_last_bank_in_block = isLastBankInBlock(f3_aligned_pc)</span><br><span class="line">  <span class="keyword">val</span> f3_is_rvc       = <span class="type">Wire</span>(<span class="type">Vec</span>(fetchWidth, <span class="type">Bool</span>()))</span><br><span class="line">  <span class="keyword">val</span> f3_redirects    = <span class="type">Wire</span>(<span class="type">Vec</span>(fetchWidth, <span class="type">Bool</span>()))</span><br><span class="line">  <span class="keyword">val</span> f3_targs        = <span class="type">Wire</span>(<span class="type">Vec</span>(fetchWidth, <span class="type">UInt</span>(vaddrBitsExtended.<span class="type">W</span>)))</span><br><span class="line">  <span class="keyword">val</span> f3_cfi_types    = <span class="type">Wire</span>(<span class="type">Vec</span>(fetchWidth, <span class="type">UInt</span>(<span class="type">CFI_SZ</span>.<span class="type">W</span>)))</span><br><span class="line">  <span class="keyword">val</span> f3_shadowed_mask = <span class="type">Wire</span>(<span class="type">Vec</span>(fetchWidth, <span class="type">Bool</span>()))</span><br><span class="line">  <span class="keyword">val</span> f3_fetch_bundle = <span class="type">Wire</span>(<span class="keyword">new</span> <span class="type">FetchBundle</span>)</span><br><span class="line">  <span class="keyword">val</span> f3_mask         = <span class="type">Wire</span>(<span class="type">Vec</span>(fetchWidth, <span class="type">Bool</span>()))</span><br><span class="line">  <span class="keyword">val</span> f3_br_mask      = <span class="type">Wire</span>(<span class="type">Vec</span>(fetchWidth, <span class="type">Bool</span>()))</span><br><span class="line">  <span class="keyword">val</span> f3_call_mask    = <span class="type">Wire</span>(<span class="type">Vec</span>(fetchWidth, <span class="type">Bool</span>()))</span><br><span class="line">  <span class="keyword">val</span> f3_ret_mask     = <span class="type">Wire</span>(<span class="type">Vec</span>(fetchWidth, <span class="type">Bool</span>()))</span><br><span class="line">  <span class="keyword">val</span> f3_npc_plus4_mask = <span class="type">Wire</span>(<span class="type">Vec</span>(fetchWidth, <span class="type">Bool</span>()))</span><br><span class="line">  <span class="keyword">val</span> f3_btb_mispredicts = <span class="type">Wire</span>(<span class="type">Vec</span>(fetchWidth, <span class="type">Bool</span>()))</span><br><span class="line"></span><br><span class="line">  <span class="comment">// f3_fetch_bundle </span></span><br><span class="line">  f3_fetch_bundle.mask := f3_mask.asUInt</span><br><span class="line">  f3_fetch_bundle.br_mask := f3_br_mask.asUInt</span><br><span class="line">  f3_fetch_bundle.pc := f3_imemresp.pc</span><br><span class="line">  f3_fetch_bundle.ftq_idx := <span class="number">0.</span><span class="type">U</span> <span class="comment">// This gets assigned later</span></span><br><span class="line">  f3_fetch_bundle.xcpt_pf_if := f3_imemresp.xcpt.pf.inst</span><br><span class="line">  f3_fetch_bundle.xcpt_ae_if := f3_imemresp.xcpt.ae.inst</span><br><span class="line">  f3_fetch_bundle.fsrc := f3_imemresp.fsrc</span><br><span class="line">  f3_fetch_bundle.tsrc := f3_imemresp.tsrc</span><br><span class="line">  f3_fetch_bundle.shadowed_mask := f3_shadowed_mask</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Tracks trailing 16b of previous fetch packet</span></span><br><span class="line">  <span class="keyword">val</span> f3_prev_half    = <span class="type">Reg</span>(<span class="type">UInt</span>(<span class="number">16.</span><span class="type">W</span>))</span><br><span class="line">  <span class="comment">// Tracks if last fetchpacket contained a half-inst</span></span><br><span class="line">  <span class="keyword">val</span> f3_prev_is_half = <span class="type">RegInit</span>(<span class="literal">false</span>.<span class="type">B</span>)</span><br><span class="line"></span><br><span class="line">  require(fetchWidth &gt;= <span class="number">4</span>) <span class="comment">// Logic gets kind of annoying with fetchWidth = 2</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">isRVC</span></span>(inst: <span class="type">UInt</span>) = (inst(<span class="number">1</span>,<span class="number">0</span>) =/= <span class="number">3.</span><span class="type">U</span>)</span><br><span class="line">  <span class="keyword">var</span> redirect_found = <span class="literal">false</span>.<span class="type">B</span></span><br><span class="line">  <span class="keyword">var</span> bank_prev_is_half = f3_prev_is_half</span><br><span class="line">  <span class="keyword">var</span> bank_prev_half    = f3_prev_half</span><br><span class="line">  <span class="keyword">var</span> last_inst = <span class="number">0.</span><span class="type">U</span>(<span class="number">16.</span><span class="type">W</span>)</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 下面的硬件都是并行的</span></span><br><span class="line">  <span class="comment">// 这里主要的困难是需要处理 16b和32b指令混合使用时导致非的对齐情况，并且在fetchBuff中确定好每条指令的起始地址</span></span><br><span class="line">  <span class="keyword">for</span> (b &lt;- <span class="number">0</span> until nBanks) &#123; <span class="comment">// 分多个Bank处理,每个b对应每个Bank,0th bank对应f3_data(31,0) 1th bank对应f3_data(63,32)</span></span><br><span class="line">    <span class="keyword">val</span> bank_data  = f3_data((b+<span class="number">1</span>)*bankWidth*<span class="number">16</span><span class="number">-1</span>, b*bankWidth*<span class="number">16</span>) <span class="comment">// data of bank from IMem; bankWidth = fetchWidth / nBanks； 一个b计算一次bank_data，取出bandWith个16b；</span></span><br><span class="line">    <span class="comment">// 实际生成的硬件信号是 wire [63:0] bank_data (after unrolling the loop) ?</span></span><br><span class="line">    <span class="keyword">val</span> bank_mask  = <span class="type">Wire</span>(<span class="type">Vec</span>(bankWidth, <span class="type">Bool</span>()))</span><br><span class="line">    <span class="keyword">val</span> bank_insts = <span class="type">Wire</span>(<span class="type">Vec</span>(bankWidth, <span class="type">UInt</span>(<span class="number">32.</span><span class="type">W</span>))) <span class="comment">// insts of bank from IMem，保存bankWidth条, 每条32位</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (w &lt;- <span class="number">0</span> until bankWidth) &#123; <span class="comment">// 一个w对应一个16b</span></span><br><span class="line">      <span class="keyword">val</span> i = (b * bankWidth) + w <span class="comment">// i定位到在f3_imemresp中当前指令的具体位置，w是每个bank内部的指令索引，i是整个f的指令索引</span></span><br><span class="line"></span><br><span class="line">      <span class="keyword">val</span> valid = <span class="type">Wire</span>(<span class="type">Bool</span>())</span><br><span class="line">      <span class="keyword">val</span> bpu = <span class="type">Module</span>(<span class="keyword">new</span> <span class="type">BreakpointUnit</span>(nBreakpoints)) <span class="comment">// 不知道是啥，看起来像是CheckingPoint?</span></span><br><span class="line">      bpu.io.status   := io.cpu.status</span><br><span class="line">      bpu.io.bp       := io.cpu.bp</span><br><span class="line">      bpu.io.ea       := <span class="type">DontCare</span></span><br><span class="line">      bpu.io.mcontext := io.cpu.mcontext</span><br><span class="line">      bpu.io.scontext := io.cpu.scontext</span><br><span class="line"></span><br><span class="line">      <span class="keyword">val</span> brsigs = <span class="type">Wire</span>(<span class="keyword">new</span> <span class="type">BranchDecodeSignals</span>)</span><br><span class="line">      <span class="keyword">if</span> (w == <span class="number">0</span>) &#123;  <span class="comment">// 每个Bank的第一条指令</span></span><br><span class="line">        <span class="keyword">val</span> inst0 = <span class="type">Cat</span>(bank_data(<span class="number">15</span>,<span class="number">0</span>), f3_prev_half) <span class="comment">// 上一个尾部16b,可能来自同一个IMemResp, f3_prev_half(f3整体的)，bank_prev_half(每个bank自己的)，</span></span><br><span class="line">        <span class="keyword">val</span> inst1 = bank_data(<span class="number">31</span>,<span class="number">0</span>)</span><br><span class="line">        <span class="keyword">val</span> exp_inst0 = <span class="type">ExpandRVC</span>(inst0)</span><br><span class="line">        <span class="keyword">val</span> exp_inst1 = <span class="type">ExpandRVC</span>(inst1)</span><br><span class="line">        <span class="keyword">val</span> pc0 = (f3_aligned_pc + (i &lt;&lt; log2Ceil(coreInstBytes)).<span class="type">U</span> - <span class="number">2.</span><span class="type">U</span>)</span><br><span class="line">        <span class="keyword">val</span> pc1 = (f3_aligned_pc + (i &lt;&lt; log2Ceil(coreInstBytes)).<span class="type">U</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">val</span> bpd_decoder0 = <span class="type">Module</span>(<span class="keyword">new</span> <span class="type">BranchDecode</span>)</span><br><span class="line">        bpd_decoder0.io.inst := exp_inst0</span><br><span class="line">        bpd_decoder0.io.pc   := pc0</span><br><span class="line">        <span class="keyword">val</span> bpd_decoder1 = <span class="type">Module</span>(<span class="keyword">new</span> <span class="type">BranchDecode</span>)</span><br><span class="line">        bpd_decoder1.io.inst := exp_inst1</span><br><span class="line">        bpd_decoder1.io.pc   := pc1</span><br><span class="line"></span><br><span class="line">      when (bank_prev_is_half) &#123; <span class="comment">// 处理半条指令 用inst0</span></span><br><span class="line">          bank_insts(w)                := inst0</span><br><span class="line">          f3_fetch_bundle.insts(i)     := inst0</span><br><span class="line">          f3_fetch_bundle.exp_insts(i) := exp_inst0</span><br><span class="line">          bpu.io.pc                    := pc0</span><br><span class="line">          brsigs                       := bpd_decoder0.io.out</span><br><span class="line">          f3_fetch_bundle.edge_inst(b) := <span class="literal">true</span>.<span class="type">B</span></span><br><span class="line">          <span class="keyword">if</span> (b &gt; <span class="number">0</span>) &#123; <span class="comment">// 不是第一个bank</span></span><br><span class="line">            <span class="keyword">val</span> inst0b     = <span class="type">Cat</span>(bank_data(<span class="number">15</span>,<span class="number">0</span>), last_inst) <span class="comment">// </span></span><br><span class="line">            <span class="keyword">val</span> exp_inst0b = <span class="type">ExpandRVC</span>(inst0b)</span><br><span class="line">            <span class="keyword">val</span> bpd_decoder0b = <span class="type">Module</span>(<span class="keyword">new</span> <span class="type">BranchDecode</span>)</span><br><span class="line">            bpd_decoder0b.io.inst := exp_inst0b</span><br><span class="line">            bpd_decoder0b.io.pc   := pc0</span><br><span class="line"></span><br><span class="line">            when (f3_bank_mask(b<span class="number">-1</span>)) &#123; <span class="comment">// 且前一个bank没屏蔽</span></span><br><span class="line">              bank_insts(w)                := inst0b</span><br><span class="line">              f3_fetch_bundle.insts(i)     := inst0b</span><br><span class="line">              f3_fetch_bundle.exp_insts(i) := exp_inst0b</span><br><span class="line">              brsigs                       := bpd_decoder0b.io.out</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125; .otherwise &#123; <span class="comment">// 没有wrap around</span></span><br><span class="line">          bank_insts(w)                := inst1</span><br><span class="line">          f3_fetch_bundle.insts(i)     := inst1</span><br><span class="line">          f3_fetch_bundle.exp_insts(i) := exp_inst1</span><br><span class="line">          bpu.io.pc                    := pc1</span><br><span class="line">          brsigs                       := bpd_decoder1.io.out</span><br><span class="line">          f3_fetch_bundle.edge_inst(b) := <span class="literal">false</span>.<span class="type">B</span></span><br><span class="line">        &#125;</span><br><span class="line">        valid := <span class="literal">true</span>.<span class="type">B</span></span><br><span class="line">      &#125; <span class="keyword">else</span> &#123; <span class="comment">// w != 0</span></span><br><span class="line">        <span class="keyword">val</span> inst = <span class="type">Wire</span>(<span class="type">UInt</span>(<span class="number">32.</span><span class="type">W</span>))</span><br><span class="line">        <span class="keyword">val</span> exp_inst = <span class="type">ExpandRVC</span>(inst)</span><br><span class="line">        <span class="keyword">val</span> pc = f3_aligned_pc + (i &lt;&lt; log2Ceil(coreInstBytes)).<span class="type">U</span></span><br><span class="line">        <span class="keyword">val</span> bpd_decoder = <span class="type">Module</span>(<span class="keyword">new</span> <span class="type">BranchDecode</span>) <span class="comment">// 用于解码指令是不是br</span></span><br><span class="line">        <span class="comment">// 插入bpd中</span></span><br><span class="line">        bpd_decoder.io.inst := exp_inst</span><br><span class="line">        bpd_decoder.io.pc   := pc</span><br><span class="line"></span><br><span class="line">        bank_insts(w)                := inst</span><br><span class="line">        f3_fetch_bundle.insts(i)     := inst</span><br><span class="line">        f3_fetch_bundle.exp_insts(i) := exp_inst</span><br><span class="line">        bpu.io.pc                    := pc</span><br><span class="line">        brsigs                       := bpd_decoder.io.out</span><br><span class="line">        <span class="keyword">if</span> (w == <span class="number">1</span>) &#123;</span><br><span class="line">          <span class="comment">// Need special case since 0th instruction may carry over the wrap around</span></span><br><span class="line">          inst  := bank_data(<span class="number">47</span>,<span class="number">16</span>) <span class="comment">//</span></span><br><span class="line">          valid := bank_prev_is_half || !(bank_mask(<span class="number">0</span>) &amp;&amp; !isRVC(bank_insts(<span class="number">0</span>))) <span class="comment">// 如果有half（也就是前16b用于拼接了）或 0th bank_data被屏蔽了或是RVC</span></span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (w == bankWidth - <span class="number">1</span>) &#123; <span class="comment">// 已经到最后一个16b了</span></span><br><span class="line">          inst  := <span class="type">Cat</span>(<span class="number">0.</span><span class="type">U</span>(<span class="number">16.</span><span class="type">W</span>), bank_data(bankWidth*<span class="number">16</span><span class="number">-1</span>,(bankWidth<span class="number">-1</span>)*<span class="number">16</span>)) <span class="comment">// 这就是一个合法的16b指令</span></span><br><span class="line">          valid := !((bank_mask(w<span class="number">-1</span>) &amp;&amp; !isRVC(bank_insts(w<span class="number">-1</span>))) ||</span><br><span class="line">            !isRVC(inst)) <span class="comment">// 当下的inst是RVC 且 (前一个指令被屏蔽 或前一个指令是RVC)</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          inst  := bank_data(w*<span class="number">16</span>+<span class="number">32</span><span class="number">-1</span>,w*<span class="number">16</span>)</span><br><span class="line">          valid := !(bank_mask(w<span class="number">-1</span>) &amp;&amp; !isRVC(bank_insts(w<span class="number">-1</span>))) <span class="comment">// 前一个指令被屏蔽 或 前一个指令是RVC</span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      f3_is_rvc(i) := isRVC(bank_insts(w))  <span class="comment">// 这里会看是不是RVC,即使我们在bank_insts中放置了32bit，在这里也会被发现内部藏了一个16bit</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">      bank_mask(w) := f3.io.deq.valid &amp;&amp; f3_imemresp.mask(i) &amp;&amp; valid &amp;&amp; !redirect_found <span class="comment">// 一个w对应一个bank_data 和一个bank_mask</span></span><br><span class="line">      f3_mask  (i) := f3.io.deq.valid &amp;&amp; f3_imemresp.mask(i) &amp;&amp; valid &amp;&amp; !redirect_found</span><br><span class="line">      f3_targs (i) := <span class="type">Mux</span>(brsigs.cfi_type === <span class="type">CFI_JALR</span>,  <span class="comment">// JALR指令就走bpd,否则走br</span></span><br><span class="line">        f3_bpd_resp.io.deq.bits.preds(i).predicted_pc.bits,</span><br><span class="line">        brsigs.target)</span><br><span class="line"></span><br><span class="line">      <span class="comment">// Flush BTB entries for JALs if we mispredict the target</span></span><br><span class="line">      f3_btb_mispredicts(i) := (brsigs.cfi_type === <span class="type">CFI_JAL</span> &amp;&amp; valid &amp;&amp;</span><br><span class="line">        f3_bpd_resp.io.deq.bits.preds(i).predicted_pc.valid &amp;&amp;</span><br><span class="line">        (f3_bpd_resp.io.deq.bits.preds(i).predicted_pc.bits =/= brsigs.target)</span><br><span class="line">      )</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">      <span class="comment">// 判断是不是加4(是不是32bit)</span></span><br><span class="line">      f3_npc_plus4_mask(i) := (<span class="keyword">if</span> (w == <span class="number">0</span>) &#123; </span><br><span class="line">        !f3_is_rvc(i) &amp;&amp; !bank_prev_is_half</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        !f3_is_rvc(i)</span><br><span class="line">      &#125;)</span><br><span class="line">      <span class="keyword">val</span> offset_from_aligned_pc = (</span><br><span class="line">        (i &lt;&lt; <span class="number">1</span>).<span class="type">U</span>((log2Ceil(icBlockBytes)+<span class="number">1</span>).<span class="type">W</span>) +</span><br><span class="line">        brsigs.sfb_offset.bits -</span><br><span class="line">        <span class="type">Mux</span>(bank_prev_is_half &amp;&amp; (w == <span class="number">0</span>).<span class="type">B</span>, <span class="number">2.</span><span class="type">U</span>, <span class="number">0.</span><span class="type">U</span>)</span><br><span class="line">      )</span><br><span class="line">      <span class="keyword">val</span> lower_mask = <span class="type">Wire</span>(<span class="type">UInt</span>((<span class="number">2</span>*fetchWidth).<span class="type">W</span>))</span><br><span class="line">      <span class="keyword">val</span> upper_mask = <span class="type">Wire</span>(<span class="type">UInt</span>((<span class="number">2</span>*fetchWidth).<span class="type">W</span>))</span><br><span class="line">      lower_mask := <span class="type">UIntToOH</span>(i.<span class="type">U</span>)</span><br><span class="line">      upper_mask := <span class="type">UIntToOH</span>(offset_from_aligned_pc(log2Ceil(fetchBytes)+<span class="number">1</span>,<span class="number">1</span>)) &lt;&lt; <span class="type">Mux</span>(f3_is_last_bank_in_block, bankWidth.<span class="type">U</span>, <span class="number">0.</span><span class="type">U</span>)</span><br><span class="line"></span><br><span class="line">      f3_fetch_bundle.sfbs(i) := (</span><br><span class="line">        f3_mask(i) &amp;&amp;</span><br><span class="line">        brsigs.sfb_offset.valid &amp;&amp;</span><br><span class="line">        (offset_from_aligned_pc &lt;= <span class="type">Mux</span>(f3_is_last_bank_in_block, (fetchBytes+bankBytes).<span class="type">U</span>,(<span class="number">2</span>*fetchBytes).<span class="type">U</span>))</span><br><span class="line">      )</span><br><span class="line">      f3_fetch_bundle.sfb_masks(i)       := ~<span class="type">MaskLower</span>(lower_mask) &amp; ~<span class="type">MaskUpper</span>(upper_mask)</span><br><span class="line">      f3_fetch_bundle.shadowable_mask(i) := (!(f3_fetch_bundle.xcpt_pf_if || f3_fetch_bundle.xcpt_ae_if || bpu.io.debug_if || bpu.io.xcpt_if) &amp;&amp;</span><br><span class="line">                                             f3_bank_mask(b) &amp;&amp;</span><br><span class="line">                                             (brsigs.shadowable || !f3_mask(i)))</span><br><span class="line">      f3_fetch_bundle.sfb_dests(i)       := offset_from_aligned_pc</span><br><span class="line"></span><br><span class="line">      <span class="comment">// Redirect if</span></span><br><span class="line">      <span class="comment">//  1) its a JAL/JALR (unconditional)</span></span><br><span class="line">      <span class="comment">//  2) the BPD believes this is a branch and says we should take it</span></span><br><span class="line">      f3_redirects(i)    := f3_mask(i) &amp;&amp; (</span><br><span class="line">        brsigs.cfi_type === <span class="type">CFI_JAL</span> || brsigs.cfi_type === <span class="type">CFI_JALR</span> ||</span><br><span class="line">        (brsigs.cfi_type === <span class="type">CFI_BR</span> &amp;&amp; f3_bpd_resp.io.deq.bits.preds(i).taken &amp;&amp; useBPD.<span class="type">B</span>)</span><br><span class="line">      )</span><br><span class="line"></span><br><span class="line">      f3_br_mask(i)   := f3_mask(i) &amp;&amp; brsigs.cfi_type === <span class="type">CFI_BR</span></span><br><span class="line">      f3_cfi_types(i) := brsigs.cfi_type</span><br><span class="line">      f3_call_mask(i) := brsigs.is_call</span><br><span class="line">      f3_ret_mask(i)  := brsigs.is_ret</span><br><span class="line"></span><br><span class="line">      f3_fetch_bundle.bp_debug_if_oh(i) := bpu.io.debug_if</span><br><span class="line">      f3_fetch_bundle.bp_xcpt_if_oh (i) := bpu.io.xcpt_if</span><br><span class="line"></span><br><span class="line">      redirect_found = redirect_found || f3_redirects(i)</span><br><span class="line">    &#125; <span class="comment">// 处理完一行bank后就要更新last_inst</span></span><br><span class="line">    last_inst = bank_insts(bankWidth<span class="number">-1</span>)(<span class="number">15</span>,<span class="number">0</span>) <span class="comment">// 每个bank中的最后一个指令的最后16位(15,0)</span></span><br><span class="line">    bank_prev_is_half = <span class="type">Mux</span>(f3_bank_mask(b),</span><br><span class="line">      (!(bank_mask(bankWidth<span class="number">-2</span>) &amp;&amp; !isRVC(bank_insts(bankWidth<span class="number">-2</span>))) &amp;&amp; !isRVC(last_inst)),  </span><br><span class="line">      bank_prev_is_half)</span><br><span class="line">        <span class="comment">// 怎么样才会是跨边界了的指令呢？ 如果当前bank的掩码为0（根本不使用），那直接继承之前的状态；否则需要查看bank内的情况，(0,0)处被屏蔽掉了或(0,0)是RVC指令，且(0,1)处不是RVC指令</span></span><br><span class="line">    bank_prev_half    = <span class="type">Mux</span>(f3_bank_mask(b),</span><br><span class="line">      last_inst(<span class="number">15</span>,<span class="number">0</span>),</span><br><span class="line">      bank_prev_half)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  f3_fetch_bundle.cfi_type      := f3_cfi_types(f3_fetch_bundle.cfi_idx.bits)</span><br><span class="line">  f3_fetch_bundle.cfi_is_call   := f3_call_mask(f3_fetch_bundle.cfi_idx.bits)</span><br><span class="line">  f3_fetch_bundle.cfi_is_ret    := f3_ret_mask (f3_fetch_bundle.cfi_idx.bits)</span><br><span class="line">  f3_fetch_bundle.cfi_npc_plus4 := f3_npc_plus4_mask(f3_fetch_bundle.cfi_idx.bits)</span><br><span class="line"></span><br><span class="line">  f3_fetch_bundle.ghist    := f3.io.deq.bits.ghist</span><br><span class="line">  f3_fetch_bundle.lhist    := f3_bpd_resp.io.deq.bits.lhist</span><br><span class="line">  f3_fetch_bundle.bpd_meta := f3_bpd_resp.io.deq.bits.meta</span><br><span class="line"></span><br><span class="line">  f3_fetch_bundle.end_half.valid := bank_prev_is_half</span><br><span class="line">  f3_fetch_bundle.end_half.bits  := bank_prev_half</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 每次f3发射的时候，就把bank的跟踪记录更新到f3整体的跟踪记录上</span></span><br><span class="line">  when (f3.io.deq.fire) &#123;</span><br><span class="line">    f3_prev_is_half := bank_prev_is_half</span><br><span class="line">    f3_prev_half    := bank_prev_half</span><br><span class="line">    assert(f3_bpd_resp.io.deq.bits.pc === f3_fetch_bundle.pc)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  when (f3_clear) &#123;</span><br><span class="line">    f3_prev_is_half := <span class="literal">false</span>.<span class="type">B</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  f3_fetch_bundle.cfi_idx.valid := f3_redirects.reduce(_||_)</span><br><span class="line">  f3_fetch_bundle.cfi_idx.bits  := <span class="type">PriorityEncoder</span>(f3_redirects)</span><br><span class="line"></span><br><span class="line">  f3_fetch_bundle.ras_top := ras.io.read_addr</span><br><span class="line">  <span class="comment">// Redirect earlier stages only if the later stage</span></span><br><span class="line">  <span class="comment">// can consume this packet</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">val</span> f3_predicted_target = <span class="type">Mux</span>(f3_redirects.reduce(_||_),</span><br><span class="line">    <span class="type">Mux</span>(f3_fetch_bundle.cfi_is_ret &amp;&amp; useBPD.<span class="type">B</span> &amp;&amp; useRAS.<span class="type">B</span>,</span><br><span class="line">      ras.io.read_addr,</span><br><span class="line">      f3_targs(<span class="type">PriorityEncoder</span>(f3_redirects))</span><br><span class="line">    ),</span><br><span class="line">    nextFetch(f3_fetch_bundle.pc)</span><br><span class="line">  )</span><br><span class="line"></span><br><span class="line">  f3_fetch_bundle.next_pc       := f3_predicted_target</span><br><span class="line">  <span class="keyword">val</span> f3_predicted_ghist = f3_fetch_bundle.ghist.update(</span><br><span class="line">    f3_fetch_bundle.br_mask,</span><br><span class="line">    f3_fetch_bundle.cfi_idx.valid,</span><br><span class="line">    f3_fetch_bundle.br_mask(f3_fetch_bundle.cfi_idx.bits),</span><br><span class="line">    f3_fetch_bundle.cfi_idx.bits,</span><br><span class="line">    f3_fetch_bundle.cfi_idx.valid,</span><br><span class="line">    f3_fetch_bundle.pc,</span><br><span class="line">    f3_fetch_bundle.cfi_is_call,</span><br><span class="line">    f3_fetch_bundle.cfi_is_ret</span><br><span class="line">  )</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  ras.io.write_valid := <span class="literal">false</span>.<span class="type">B</span></span><br><span class="line">  ras.io.write_addr  := f3_aligned_pc + (f3_fetch_bundle.cfi_idx.bits &lt;&lt; <span class="number">1</span>) + <span class="type">Mux</span>(</span><br><span class="line">    f3_fetch_bundle.cfi_npc_plus4, <span class="number">4.</span><span class="type">U</span>, <span class="number">2.</span><span class="type">U</span>)</span><br><span class="line">  ras.io.write_idx   := <span class="type">WrapInc</span>(f3_fetch_bundle.ghist.ras_idx, nRasEntries)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  <span class="keyword">val</span> f3_correct_f1_ghist = s1_ghist =/= f3_predicted_ghist &amp;&amp; enableGHistStallRepair.<span class="type">B</span></span><br><span class="line">  <span class="keyword">val</span> f3_correct_f2_ghist = s2_ghist =/= f3_predicted_ghist &amp;&amp; enableGHistStallRepair.<span class="type">B</span></span><br><span class="line"></span><br><span class="line">  when (f3.io.deq.valid &amp;&amp; f4_ready) &#123;</span><br><span class="line">    when (f3_fetch_bundle.cfi_is_call &amp;&amp; f3_fetch_bundle.cfi_idx.valid) &#123;</span><br><span class="line">      ras.io.write_valid := <span class="literal">true</span>.<span class="type">B</span></span><br><span class="line">    &#125;</span><br><span class="line">    when (f3_redirects.reduce(_||_)) &#123;</span><br><span class="line">      f3_prev_is_half := <span class="literal">false</span>.<span class="type">B</span></span><br><span class="line">    &#125;</span><br><span class="line">    when (s2_valid &amp;&amp; s2_vpc === f3_predicted_target &amp;&amp; !f3_correct_f2_ghist) &#123;</span><br><span class="line">      f3.io.enq.bits.ghist := f3_predicted_ghist</span><br><span class="line">    &#125; .elsewhen (!s2_valid &amp;&amp; s1_valid &amp;&amp; s1_vpc === f3_predicted_target &amp;&amp; !f3_correct_f1_ghist) &#123;</span><br><span class="line">      s2_ghist := f3_predicted_ghist</span><br><span class="line">    &#125; .elsewhen (( s2_valid &amp;&amp;  (s2_vpc =/= f3_predicted_target || f3_correct_f2_ghist)) ||</span><br><span class="line">          (!s2_valid &amp;&amp;  s1_valid &amp;&amp; (s1_vpc =/= f3_predicted_target || f3_correct_f1_ghist)) ||</span><br><span class="line">          (!s2_valid &amp;&amp; !s1_valid)) &#123;</span><br><span class="line">      f2_clear := <span class="literal">true</span>.<span class="type">B</span></span><br><span class="line">      f1_clear := <span class="literal">true</span>.<span class="type">B</span></span><br><span class="line"></span><br><span class="line">      s0_valid     := !(f3_fetch_bundle.xcpt_pf_if || f3_fetch_bundle.xcpt_ae_if)</span><br><span class="line">      s0_vpc       := f3_predicted_target</span><br><span class="line">      s0_is_replay := <span class="literal">false</span>.<span class="type">B</span></span><br><span class="line">      s0_ghist     := f3_predicted_ghist</span><br><span class="line">      s0_tsrc      := <span class="type">BSRC_3</span></span><br><span class="line"></span><br><span class="line">      f3_fetch_bundle.fsrc := <span class="type">BSRC_3</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// When f3 finds a btb mispredict, queue up a bpd correction update</span></span><br><span class="line">  <span class="keyword">val</span> f4_btb_corrections = <span class="type">Module</span>(<span class="keyword">new</span> <span class="type">Queue</span>(<span class="keyword">new</span> <span class="type">BranchPredictionUpdate</span>, <span class="number">2</span>))</span><br><span class="line">  f4_btb_corrections.io.enq.valid := f3.io.deq.fire &amp;&amp; f3_btb_mispredicts.reduce(_||_) &amp;&amp; enableBTBFastRepair.<span class="type">B</span></span><br><span class="line">  f4_btb_corrections.io.enq.bits  := <span class="type">DontCare</span></span><br><span class="line">  f4_btb_corrections.io.enq.bits.is_mispredict_update := <span class="literal">false</span>.<span class="type">B</span></span><br><span class="line">  f4_btb_corrections.io.enq.bits.is_repair_update     := <span class="literal">false</span>.<span class="type">B</span></span><br><span class="line">  f4_btb_corrections.io.enq.bits.btb_mispredicts      := f3_btb_mispredicts.asUInt</span><br><span class="line">  f4_btb_corrections.io.enq.bits.pc                   := f3_fetch_bundle.pc</span><br><span class="line">  f4_btb_corrections.io.enq.bits.ghist                := f3_fetch_bundle.ghist</span><br><span class="line">  f4_btb_corrections.io.enq.bits.lhist                := f3_fetch_bundle.lhist</span><br><span class="line">  f4_btb_corrections.io.enq.bits.meta                 := f3_fetch_bundle.bpd_meta</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>在f3阶段有一个重要的工作就是对于来自ICache的Response进行拆解分析，区分出RVC(16bits)指令和普通指令(32bits)并放置到<code>fetch_bundle</code>中，方便后续使用，其实现比较复杂难懂，在这里作简要说明。<br />
+<img src="/images/F3_bank_insts.jpg" alt="" /><br />
+如上图所示，每个周期，从ICache来的数据<code>f3_data</code>为64bits,将其分为2个Banks,并在循环中用二维索引(w,b)进行表示(当然在循环中只能看到最内层的w，外层的b是隐藏的索引)。在<code>fetch_bundle</code>中，为了用最少的位置存放所有可能的情况，这里将<code>fetch_bundle.insts</code>也按照w,b设置为4项，分别表示以这个位置开头的指令（也就是以<code>f3_data(0)</code>,<code>f3_data(16)</code>,<code>f3_data(32)</code>,<code>f3_data(48)</code>开头的指令），而以这些位置开头的指令是否合法，则使用<code>f3_mask</code>等信号进行控制。在进行拆解的过程中，可能会使用前面“残留的”指令与当前部分指令进行拼接，生成对应指令，具体过程如上图标注。</p>
+<h4 id="f4-f5"><a class="markdownIt-Anchor" href="#f4-f5"></a> F4 &amp; F5</h4>
+<p><strong>TO DO</strong></p>
+<h4 id="关键信号跟踪"><a class="markdownIt-Anchor" href="#关键信号跟踪"></a> 关键信号跟踪</h4>
+<h5 id="sx_valid"><a class="markdownIt-Anchor" href="#sx_valid"></a> <code>sx_valid</code></h5>
+<p><code>sx_valid</code>信号就是每个阶段stage x的使能信号，只有使能信号为<code>true.B</code>时，流水段才可能流动(当然还可能要看其他信号，如<code>fx_clear</code>)，<code>s0_valid</code>信号是一个WireInt类型信号，同时<code>s0_valid</code>信号随着流水线流动，逐步赋值给<code>sx_valid</code>这些Reg类型信号，进而使能对应阶段及其内部的部件</p>
+<ol>
+<li><code>s0_valid</code>作为最初的使能信号，在复位后变为<code>true.B</code>，在F0阶段使能ICache和BPD这两个部件；在如下情形下会被置为<code>false.B</code>：
+<ul>
+<li>F1阶段：当前指令是ae或pf(通过s1_tlb_resp判断)</li>
+<li>F2阶段：
+<ul>
+<li>ICache没准备好或F3未准备好：当前指令的TLB命中了，不需要replay，且是ae或pf(通过s2_tlb_miss,s2_is_replay,s2_tlb_resp判断)</li>
+<li>F3已准备好，F2未使能或F2已使能但下条指令和当前指令预测不符合：当前指令不需要replay,且是ae或pf</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>s1_valid</code>由<code>s0_valid</code>在新时钟周期到来时更新,在F1阶段中使能TLB部件；</li>
+<li><code>s2_valid</code>由<code>s1_valid</code>在新时钟周期到来时更新</li>
+</ol>
+<h5 id="sx_is_replay"><a class="markdownIt-Anchor" href="#sx_is_replay"></a> <code>sx_is_replay</code></h5>
+<p><code>sx_is_replay</code>信号控制部件进行重复执行操作，如某条指令若在F2阶段发现F3阶段未准备好，其会重新转回F1阶段进行执行。</p>
+<ol>
+<li><code>s0_is_replay</code>是最初的replay信号，复位后变为<code>false.B</code>，在F2阶段中，若F3未准备好，则会被置为<code>true.B</code></li>
+<li><code>s1_is_replay</code>由<code>s0_is_replay</code>在新时钟周期到来时更新，为<code>true.B</code>时：
+<ul>
+<li>F1阶段：阻塞对tlb请求的使能，选择实际来自F2阶段传入的<code>tlb_resp</code>作为<code>tlb_resp</code>，选择F2阶段传入的<code>tlb_ppc</code>作为<code>tlb_ppc</code></li>
+</ul>
+</li>
+</ol>
+<h5 id="fx_clear"><a class="markdownIt-Anchor" href="#fx_clear"></a> <code>fx_clear</code></h5>
+<p><code>fx_clear</code>信号控制是否刷新流水段</p>
+<ol>
+<li><code>f1_clear</code>在F1阶段阻塞对tlb请求的使能，阻塞<code>s1_valid</code>向<code>s2_valid</code>传播，使能对Icache的s1_kill信号。在如下情况下会被置为<code>true.B</code>
+<ul>
+<li>F2阶段：ICache或F3未准备好；ICache和F3已准备好，但下条指令和当前指令预测不符合</li>
+<li>F3阶段：</li>
+<li>F5阶段：</li>
+</ul>
+</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://taosicheng2001.github.io/2024/04/07/RISCV-BOOM-2/" data-id="clynteazd0006u5sb97ql2drf" data-title="RISCV-BOOM(2)" class="article-share-link">Share</a>
+      
+      
+      
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Code-Reading/" rel="tag">Code Reading</a></li></ul>
+
+
+    </footer>
+  </div>
+  
+    
+  <nav id="article-nav" class="wow fadeInUp">
+    
+      <div class="article-nav-link-wrap article-nav-link-left">
+        
+          
+          
+            <img data-src="/covers/Night.jpg" data-sizes="auto" alt="RISCV-BOOM(3)" class="lazyload">
+          
+        
+        <a href="/2024/04/11/RISCV-BOOM-3/"></a>
+        <div class="article-nav-caption">Newer</div>
+        <h3 class="article-nav-title">
+          
+            RISCV-BOOM(3)
+          
+        </h3>
+      </div>
+    
+    
+    <div class="article-nav-link-wrap article-nav-link-right">
+      
+        
+        
+          <img data-src="/covers/Night.jpg" data-sizes="auto" alt="RISCV-BOOM(1)" class="lazyload">
+        
+      
+      <a href="/2024/04/07/RISCV-BOOM-1/"></a>
+      <div class="article-nav-caption">Older</div>
+      <h3 class="article-nav-title">
+        
+          RISCV-BOOM(1)
+        
+      </h3>
+    </div>
+    
+  </nav>
+
+
+  
+</article>
+
+
+
+
+
+
+</section>
+          
+        </div>
+        <footer id="footer" class="wow fadeInUp">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      <div>
+        <span class="icon-copyright"></span>
+        2020-2025
+        <span class="footer-info-sep"></span>
+        Sora
+      </div>
+      
+        <div>
+          Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>&nbsp;
+          Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" target="_blank">Reimu</a>
+        </div>
+      
+      
+        <div>
+          <span class="icon-brush"></span>
+          9.2k
+          &nbsp;|&nbsp;
+          <span class="icon-coffee"></span>
+          00:43
+        </div>
+      
+      
+        <div>
+          <span class="icon-eye"></span>
+          <span id="busuanzi_container_site_pv">Number of visits&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+          &nbsp;|&nbsp;
+          <span class="icon-user"></span>
+          <span id="busuanzi_container_site_uv">Number of visitors&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+        </div>
+      
+    </div>
+  </div>
+</footer>
+
+        <div class="sidebar-top">
+          <img src="/images/sora_icon.png" height="50" width="50" />
+          <div class="arrow-up"></div>
+        </div>
+        <div id="mask"></div>
+      </div>
+      <nav id="mobile-nav">
+  <div class="sidebar-wrap">
+    
+      <div class="sidebar-toc-sidebar"><div class="sidebar-toc">
+  <h3 class="toc-title">Contents</h3>
+  <div class="sidebar-toc-wrapper"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#riscv-boom-front-end"><span class="toc-number">1.</span> <span class="toc-text"> RISCV-BOOM Front-End</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB"><span class="toc-number">1.1.</span> <span class="toc-text"> 代码阅读</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#boomfrontendmodule"><span class="toc-number">1.1.1.</span> <span class="toc-text"> BoomFrontendModule</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#io%E8%BF%9E%E7%BA%BF"><span class="toc-number">1.1.1.1.</span> <span class="toc-text"> IO连线</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#f0-nextpc-select"><span class="toc-number">1.1.1.2.</span> <span class="toc-text"> F0 (NextPC Select)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#f1-icache-access"><span class="toc-number">1.1.1.3.</span> <span class="toc-text"> F1 (ICache Access)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#f2-icache-response"><span class="toc-number">1.1.1.4.</span> <span class="toc-text"> F2 (ICache Response)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#f3"><span class="toc-number">1.1.1.5.</span> <span class="toc-text"> F3</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#f4-f5"><span class="toc-number">1.1.1.6.</span> <span class="toc-text"> F4 &amp; F5</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E4%BF%A1%E5%8F%B7%E8%B7%9F%E8%B8%AA"><span class="toc-number">1.1.1.7.</span> <span class="toc-text"> 关键信号跟踪</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#sx_valid"><span class="toc-number">1.1.1.7.1.</span> <span class="toc-text"> sx_valid</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#sx_is_replay"><span class="toc-number">1.1.1.7.2.</span> <span class="toc-text"> sx_is_replay</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#fx_clear"><span class="toc-number">1.1.1.7.3.</span> <span class="toc-text"> fx_clear</span></a></li></ol></li></ol></li></ol></li></ol></li></ol></div>
+</div>
+</div>
+      <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/sora.jpg" data-sizes="auto" alt="Sora" class="lazyload">
+  <div class="sidebar-author-name">Sora</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>Posts</div>
+    <div class="sidebar-state-number">6</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>Categories</div>
+    <div class="sidebar-state-number">5</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>Tags</div>
+    <div class="sidebar-state-number">4</div>
+  </div>
+</div>
+<div class="sidebar-social">
+  
+</div>
+<div class="sidebar-menu">
+  
+    <div class="sidebar-menu-link-wrap">
+      <a class="sidebar-menu-link-dummy" href="/" aria-label="Home"></a>
+      <span class="sidebar-menu-icon"></span>
+      <div class="sidebar-menu-link">Home</div>
+    </div>
+  
+    <div class="sidebar-menu-link-wrap">
+      <a class="sidebar-menu-link-dummy" href="/archives" aria-label="Archives"></a>
+      <span class="sidebar-menu-icon"></span>
+      <div class="sidebar-menu-link">Archives</div>
+    </div>
+  
+    <div class="sidebar-menu-link-wrap">
+      <a class="sidebar-menu-link-dummy" href="/about" aria-label="About"></a>
+      <span class="sidebar-menu-icon"></span>
+      <div class="sidebar-menu-link">About</div>
+    </div>
+  
+    <div class="sidebar-menu-link-wrap">
+      <a class="sidebar-menu-link-dummy" href="/friend" aria-label="Friend"></a>
+      <span class="sidebar-menu-icon"></span>
+      <div class="sidebar-menu-link">Friend</div>
+    </div>
+  
+</div>
+</div>
+    
+  </div>
+  
+    <div class="sidebar-btn-wrapper">
+      <div class="sidebar-toc-btn current"></div>
+      <div class="sidebar-common-btn"></div>
+    </div>
+  
+</nav>
+
+    </div>
+    <div class="site-search">
+      <div class="reimu-popup popup">
+        <div class="reimu-search">
+          <span class="reimu-search-input-icon"></span>
+          <div class="reimu-search-input" id="reimu-search-input"></div>
+        </div>
+        <div class="reimu-results">
+          <div id="reimu-stats"></div>
+          <div id="reimu-hits"></div>
+          <div id="reimu-pagination" class="reimu-pagination"></div>
+        </div>
+        <span class="popup-btn-close"></span>
+      </div>
+    </div>
+    
+<script src="https://npm.webcache.cn/jquery@3.7.1/dist/jquery.min.js"></script>
+
+
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js"></script>
+
+
+
+  
+<script src="https://npm.webcache.cn/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" defer></script>
+
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" async></script>
+
+
+
+
+  
+<script src="https://npm.webcache.cn/mermaid@9.4.3/dist/mermaid.min.js"></script>
+
+  <script>
+    if (window.mermaid) {
+      // https://github.com/mermaid-js/mermaid/issues/1945
+      const elementCode = '.mermaid'
+      const saveOriginalData = () => {
+        return new Promise((resolve, reject) => {
+          try {
+            var els = document.querySelectorAll(elementCode),
+                count = els.length;
+            els.forEach(element => {
+              if (element.getAttribute('data-original-code') == null){
+                element.setAttribute('data-original-code', element.innerHTML)
+              }
+              count--
+              if(count == 0){
+                resolve()
+              }
+            });
+          } catch (error) {
+          reject(error) 
+          }
+        })
+      }
+      const resetProcessed = () => {
+        return new Promise((resolve, reject) => {
+          try {
+            var els = document.querySelectorAll(elementCode),
+                count = els.length;
+            els.forEach(element => {
+              if(element.getAttribute('data-original-code') != null){
+                element.removeAttribute('data-processed')
+                element.innerHTML = element.getAttribute('data-original-code')
+              }
+              count--
+              if(count == 0){
+                resolve()
+              }
+            });
+          } catch (error) {
+          reject(error) 
+          }
+        })
+      } 
+      const loadMermaid = (theme) => {
+        window.mermaid.initialize({theme})
+        window.mermaid.init({theme}, document.querySelectorAll(elementCode))
+      }
+      document.body.addEventListener('dark-theme-set', () => {
+        saveOriginalData()
+        .then(resetProcessed())
+        .then(loadMermaid('dark'))
+        .catch(console.error)
+      })
+      document.body.addEventListener('light-theme-set', () => {
+        saveOriginalData()
+        .then(resetProcessed())
+        .then(loadMermaid('default'))
+        .catch(console.error)
+      })
+    }
+  </script>
+
+
+
+<script src="/js/pjax_script.js" data-pjax></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+<script src="/js/generator_search.js"></script>
+
+  
+<script src="https://npm.webcache.cn/instantsearch.js@4.56.1/dist/instantsearch.production.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '0.1.0' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+  <!-- hexo injector body_end start -->
+<script src="/js/insert_highlight.js" data-pjax></script>
+<!-- hexo injector body_end end --></body>
+  </html>
+
